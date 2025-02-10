@@ -22,9 +22,10 @@ const Services = () => {
                             <h6>Services</h6>
                             <h1 className="display-5">Organic Farm Services</h1>
                             <p>Empower organic farmers with modern technology, connect them to a thriving marketplace, and foster sustainable practices. Experience the best in organic produce.</p>
-                            <a href="/contact" className="btn btn-primary">Contact Us</a>
+                            <a href="/aboutus" className="btn btn-primary">Contact Us</a>
                         </div>
                     </div>
+
 
                     <div className="row">
                         <div className="col">
