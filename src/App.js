@@ -7,6 +7,7 @@ import Market from './pages/Market';
 import Dashboard from './pages/Dashboard';
 import Aboutus from './pages/Aboutus';
 import Services from './pages/services';
+import Education from './pages/education';
 import './App.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/aboutus" element={<Aboutus />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/education" element={<Education />} />
         </Routes>
         <Footer />
       </div>
