@@ -1,5 +1,7 @@
 import React from 'react';
 import './education.css';
+import video from './media/Education1.mp4';
+
 
 function Education() {
     return (
@@ -13,7 +15,7 @@ function Education() {
                         <h2>Watch Video</h2>
                         <div className="video-container">
                             <video controls>
-                                <source src="./media/Education1.mp4" type="video/mp4" />
+                                <source src={video} type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
                         </div>
