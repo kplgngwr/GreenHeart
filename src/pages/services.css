@@ -1,0 +1,168 @@
+/********** Template CSS **********/
+:root {
+    --primary: #34AD54;
+    --secondary: #FF9933;
+    --light: #F6FFF2;
+    --dark: #263A4F;
+}
+
+* {
+    text-decoration: none;
+}
+
+/* Hero Section */
+.hero-section {
+    background: url('./media/carousel-1.png') no-repeat center center;
+    background-size: cover;
+    height: 200px;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    position: relative;
+}
+
+.hero-content {
+    color: white;
+    padding-left: 100px;
+    z-index: 1;
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.btn {
+    font-family: 'Roboto', sans-serif;
+    letter-spacing: 1px;
+    font-weight: 700;
+    transition: .5s;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #34AD54;
+}
+
+.btn-secondary {
+    background-color: #FF9933;
+}
+
+.btn-primary:hover {
+    background-color: #2e9448;
+}
+
+.btn-secondary:hover {
+    background-color: #e68a2e;
+}
+
+.section {
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.col {
+    flex: 1 1 calc(33.333% - 20px);
+    margin: 10px;
+}
+
+.col h4,
+.col p {
+    text-decoration: underline;
+}
+
+
+.heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.heading h6 {
+    color: var(--primary);
+    text-transform: uppercase;
+}
+
+.heading h1 {
+    font-size: 2.5rem;
+    color: var(--dark);
+}
+
+.heading p {
+    color: #666;
+    margin: 20px 0;
+}
+
+.card {
+    box-shadow: 0 0 45px #EDEDED;
+    transition: .5s;
+    background-color: #F6FFF2;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    padding: 20px;
+    margin: 10px;
+    flex: 1 1 calc(33.333% - 20px);
+}
+
+.card i {
+    font-size: 3rem;
+    color: #34AD54;
+    margin-bottom: 10px;
+}
+
+.card h4,
+.card p,
+.card a {
+    text-decoration: none;
+}
+
+.card h4 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
+}
+
+.card p {
+    font-size: 1rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+    .card {
+        flex: 1 1 calc(50% - 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        flex: 1 1 100%;
+    }
+}

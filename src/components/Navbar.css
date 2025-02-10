@@ -1,0 +1,68 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px 0px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    height: 60px; /* Fixed height for the header */
+  }
+  
+  .logo img {
+    height: 100%; /* Make the logo fill the header height */
+    max-height: 150px; /* Set a maximum height for the logo */
+    width: auto; /* Maintain aspect ratio */
+    margin-left: 20px;
+    
+  }
+  
+
+  .items {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+  }
+  
+  .items-links {
+    margin-right: 15vw; /* Adjust this value to shift left relative to the device screen size */
+  }
+  
+  .items a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .items img.width {
+    height: 30px;
+    margin: 0 10px;
+  }
+  
+  .buts {
+    margin-left: 15px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .buts:hover {
+    background-color: #0056b3;
+  }
+  
+  #buts2 {
+    background-color: #28a745;
+  }
+  
+  #buts2:hover {
+    background-color: #218838;
+  }
+  
+  .icon {
+    font-size: 24px; /* Adjust size as needed */
+    margin: 0 10px;
+    color: #333; /* Adjust color as needed */
+  }
