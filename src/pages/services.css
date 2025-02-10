@@ -24,12 +24,13 @@
 .hero-content {
     color: white;
     padding-left: 100px;
-    z-index: 1;
+    z-index: 10;
 }
 
 .hero-content h1 {
     font-size: 2.5rem;
     font-weight: bold;
+    margin-bottom: 20px;
 }
 
 .hero-buttons {
