@@ -16,6 +16,7 @@ function Navbar() {
           <Link to="/market">Market</Link>
           <Link to="/education">Education</Link>
           <Link to="/services">Services</Link>
+          <Link to="/dashboard">Dashboard</Link>
           <Link to="/aboutus">About Us</Link>
         </div>
         <FaShoppingCart className="icon" alt="Cart" />
