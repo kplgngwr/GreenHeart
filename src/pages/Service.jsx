@@ -17,14 +17,14 @@ const Services = () => {
 
             {/* Services Section */}
             <div className="py-10 px-5 text-center">
-                <h6 className="text-green-600 uppercase tracking-wide">Services</h6>
-                <h1 className="text-3xl font-bold text-gray-900">Organic Farm Services</h1>
+                <h6 className="text-green-600 uppercase text-xl font-bold tracking-wide">Services</h6>
+                <h1 className="text-4xl font-bold text-gray-900">Organic Farm Services</h1>
                 <p className="text-gray-600 mt-3">Empower organic farmers with modern technology, connect them to a thriving marketplace, and foster sustainable practices.</p>
-                <a href="/aboutus" className="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Contact Us</a>
+                <a href="/aboutus" className="mt-4 transition-transform transform hover:scale-105 inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Contact Us</a>
             </div>
 
             {/* Services Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-10 mb-4">
                 {[
                     { icon: FaShoppingBasket, title: "Fresh and Organic Produce", description: "Discover fresh, locally sourced organic produce.", link: "/market" },
                     { icon: FaChalkboardTeacher, title: "Educational Content", description: "Access expert knowledge on organic farming.", link: "/detail" },
@@ -32,14 +32,14 @@ const Services = () => {
                     { icon: FaMicroscope, title: "Plant Disease Analyzer", description: "Identify plant diseases using AI-powered analysis.", link: "https://greenheart.streamlit.app/" },
                     { icon: FaSeedling, title: "Crop Recommendation", description: "Get personalized crop recommendations based on soil and climate.", link: "https://greenheart.streamlit.app/" }
                 ].map((service, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-md p-5 flex flex-col items-center text-center hover:shadow-lg transition-all">
+                    <div key={index} className="bg-white rounded-lg transform hover:scale-101 shadow-md p-5 flex flex-col items-center text-center hover:shadow-lg transition-all">
                         <service.icon className="text-green-600 text-3xl" />
                         <h4 className="text-xl font-semibold mt-3">{service.title}</h4>
                         <p className="text-gray-600 mt-2">{service.description}</p>
                         {service.isDisabled ? (
                             <button className="mt-4 px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed">{service.button}</button>
                         ) : (
-                            <a href={service.link} className="mt-4 inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Try it!</a>
+                            <a href={service.link} className="mt-4 transition-transform transform hover:scale-105 inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Try it!</a>
                         )}
                     </div>
                 ))}

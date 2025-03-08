@@ -7,7 +7,7 @@ function Navbar() {
   return (
     <header className="flex justify-between items-center bg-gray-100 border-b border-gray-300 h-16 px-5 md:px-10">
       <div className="h-full">
-        <img src={logo} alt="Logo" className="h-full max-h-12 w-auto" />
+        <img src={logo} alt="Logo" className=" max-h-14 w-auto " />
       </div>
         <div className="hidden md:flex space-x-6 text-gray-800 font-semibold">
           <NavLink to="/" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Home</NavLink>
