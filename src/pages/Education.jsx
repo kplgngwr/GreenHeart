@@ -4,7 +4,7 @@ import video from '/Education1.mp4';
 function Education() {
     return (
         <div className="p-5 max-w-5xl mx-auto font-sans">
-            <h1 className="text-center text-3xl text-pink-600 mb-2">Educational Videos & Content</h1>
+            <h1 className="text-center text-3xl font-bold text-pink-600 mb-2">Educational Videos & Content</h1>
             <p className="text-center text-gray-700">Feel free to request your query to be answered by our agriculture experts.</p>
             
             <div className="flex flex-col md:flex-row gap-5 mt-5">

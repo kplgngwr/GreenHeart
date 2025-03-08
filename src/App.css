@@ -39,13 +39,14 @@
 
 /* Responsive Text */
 .overlay h1 {
-    font-size: 2rem;
+    font-size: 5rem;
     font-weight: bold;
     max-width: 80%;
 }
 
 .overlay h2 {
-    font-size: 1.5rem;
-    color: #38A169;
-    margin-top: 10px;
+    font-size: 2.5rem;
+    color: #16bd64;
+    margin-top: 20px;
+    margin-bottom: 50px;
 }
