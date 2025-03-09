@@ -14,19 +14,19 @@ Green Heart is a platform designed to bridge the gap between farmers and consume
 ## Technology Stack
 - **Frontend**: React + Vite
 - **Fast Refresh**: [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) (Babel) or [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) (SWC)
-- **Backend**: [Add your backend technology here]
+- **Backend**: 
 - **Database**: Firebase, MongoDB
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js (version 14.x or higher)
-- npm or yarn
+- npm
 
 ### Installation
 1. Clone the repository
     ```
-    git clone [repository URL]
+    git clone https://github.com/kplgngwr/GreenHeart.git
     ```
 2. Navigate to the frontend directory
     ```
