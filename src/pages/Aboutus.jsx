@@ -25,7 +25,7 @@ function Aboutus() {
           <img src={visionImage} alt="Our Vision" className="w-72 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105" />
           <div className="max-w-lg">
             <h2 className="text-5xl font-bold text-green-700">Our Vision</h2>
-            <p className="text-gray-600 font-semibold">To create a world where agriculture is sustainable, transparent, and beneficial for all stakeholders involved.</p>
+            <p className="text-gray-600 font-semibold">To create a world where agriculture is sustainable, transparent, and beneficial for all stakeholders involved and a thriving agricultural ecosystem where farmers are empowered, consumers have access to fresh, quality produce, and the planet is protected.</p>
           </div>
         </div>
       </section>
