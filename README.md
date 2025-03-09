@@ -15,7 +15,7 @@ Green Heart is a platform designed to bridge the gap between farmers and consume
 - **Frontend**: React + Vite
 - **Fast Refresh**: [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) (Babel) or [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) (SWC)
 - **Backend**: [Add your backend technology here]
-- **Database**: [Add your database technology here]
+- **Database**: Firebase, MongoDB
 
 ## Getting Started
 
@@ -50,4 +50,7 @@ Green Heart is a platform designed to bridge the gap between farmers and consume
 [Add your license information here]
 
 ## Contact
-[Add project contact information here]
+Kapil Gangwar 
+```
+https://www.linkedin.com/in/kplgngwr/
+```
