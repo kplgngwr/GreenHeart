@@ -43,11 +43,6 @@ function Aboutus() {
             <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Kapil Gangwar</h3>
             <p className="text-gray-600 font-bold">COO</p>
           </div>
-          <div className="text-center animate-fadeIn">
-            <img src={team3Image} alt="Vasu" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Vasu</h3>
-            <p className="text-gray-600 font-bold">CFO</p>
-          </div>
         </div>
       </div>
     </div>
