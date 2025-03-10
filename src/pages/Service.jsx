@@ -1,11 +1,11 @@
-import React from 'react';
-
+{/* 1. Precision Farming Card */ }
+<div className="h-40 overflow-hidden bg-gradient-to-r from-green-600 to-green-400"></div>
 function ServiceOverview() {
   return (
     <>
       {/* Hero Section */}
       <section
-        className="relative h-[500px] bg-cover bg-center bg-[url(/vision.png)]"
+        className="relative h-[500px] bg-cover bg-center bg-[url('https://media.istockphoto.com/id/1139667548/photo/green-fields-of-onions-and-other-vegetables-in-eilat-israel.jpg?s=612x612&w=0&k=20&c=YSu6YoSO4JU21MKDj_CRGz20i3VVtPLc4F4OOzprKnA=')]"
       >
         <div className="absolute inset-0 bg-black opacity-60"></div>
         <div className="absolute inset-0 flex items-center justify-center">
@@ -29,223 +29,214 @@ function ServiceOverview() {
         <div className="max-w-7xl mx-auto px-4">
           {/* Introduction */}
           <div className="mb-12">
-            <h1 className="text-4xl font-bold text-center mb-6">
+            <h1 className="text-4xl font-bold text-center mb-6 bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
               GreenHeart – Services Overview
             </h1>
             <p className="max-w-3xl mx-auto text-center text-gray-700">
               GreenHeart provides a comprehensive suite of AI-powered
               agricultural services to support farmers, optimize farm operations,
               and enhance productivity. These services are categorized into two
-              main sections: <strong>For Farmers</strong> – services that help
-              individual farmers improve their crop yield and manage farm
-              operations, and <strong>For Assigned Teams/Admins</strong> – services
-              for internal teams to efficiently manage projects, analyze data, and
-              provide expert assistance.
+              main sections: <strong>For Farmers</strong> and <strong>For Assigned Teams/Admins</strong>.
             </p>
           </div>
 
-          {/* Two-Column Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Services for Farmers */}
-            <div>
-              <h2 className="text-2xl font-bold text-green-600 mb-6">
-                Services for Farmers
-              </h2>
-              <div className="space-y-6">
-                {/* 1.1 Precision Farming & AI-Powered Insights */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Precision Farming &amp; AI-Powered Insights
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>AI-Based Crop Selection:</strong> Personalized
-                      recommendations on which crops to grow based on soil health,
-                      climate conditions, and market demand.
-                    </li>
-                    <li>
-                      <strong>Yield Prediction &amp; Risk Assessment:</strong>{" "}
-                      Advanced AI models predict expected yield and potential risks
-                      due to climate change, pests, or soil degradation.
-                    </li>
-                  </ul>
-                </div>
+          {/* Farmer Services Section */}
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold text-center mb-10 relative">
+              <span className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">Services for Farmers</span>
+              <div className="absolute w-24 h-1 bg-gradient-to-r from-green-600 to-green-400 bottom5 left-1/2 transform -translate-x-1/2 mt-2"></div>
+            </h2>
 
-                {/* 1.2 Smart Soil & Water Management */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Smart Soil &amp; Water Management
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Soil Testing &amp; Nutrient Analysis:</strong> Mobile
-                      lab vans conduct on-site soil testing to determine nutrient
-                      levels and deficiencies.
-                    </li>
-                    <li>
-                      <strong>Precision Irrigation &amp; IoT-Based Water Management:</strong>{" "}
-                      Smart sensors optimize water usage, reducing waste and
-                      improving efficiency.
-                    </li>
-                  </ul>
+            {/* Services Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* 1. Precision Farming Card */}
+              <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
+                <div className="h-40 overflow-hidden bg-gradient-to-r from-green-600 to-green-400">
+                  <img src="/precision-farming.jpg" alt="Precision Farming" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                 </div>
-
-                {/* 1.3 Automated Farm Monitoring & Drone Services */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Automated Farm Monitoring &amp; Drone Services
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Drone-Based Crop Surveillance:</strong> AI-driven
-                      drones detect diseases, track growth, and identify pest
-                      infestations.
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-green-700">Precision Farming & AI-Powered Insights</h3>
+                  <ul className="space-y-2 mb-4 text-gray-600">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>AI-Based Crop Selection</strong>: Personalized recommendations based on soil and climate</span>
                     </li>
-                    <li>
-                      <strong>Automated Crop Spraying:</strong> Drone technology
-                      ensures efficient pesticide and fertilizer distribution with
-                      minimal waste.
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Yield Prediction & Risk Assessment</strong>: AI models for risk forecasting</span>
                     </li>
                   </ul>
+                  <a href="/services/precision-farming" className="inline-block px-4 py-2 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-full text-sm font-medium hover:from-green-700 hover:to-green-600 transition-all duration-300">
+                    Learn More
+                  </a>
                 </div>
+              </div>
 
-                {/* 1.4 Farm Lease & Financial Assistance */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Farm Lease &amp; Financial Assistance
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Land Leasing &amp; Management:</strong> Farmers can
-                      lease GreenHeart-managed farms equipped with AI-driven
-                      agricultural technology.
-                    </li>
-                    <li>
-                      <strong>Agri-Fintech Solutions:</strong> Crop insurance,
-                      financial advisory, and access to government subsidies and
-                      agricultural loans.
-                    </li>
-                  </ul>
+              {/* 2. Smart Soil Card */}
+              <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
+                <div className="h-40 overflow-hidden bg-gradient-to-r from-green-500 to-emerald-400">
+                  <img src="/smart-soil.jpg" alt="Smart Soil Management" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                 </div>
-
-                {/* 1.5 Farm-to-Market Logistics & Marketplace Integration */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Farm-to-Market Logistics &amp; Marketplace Integration
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Direct Selling Platform:</strong> Sell crops directly
-                      to businesses and consumers through the GreenHeart Agri-
-                      Marketplace.
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-green-700">Smart Soil & Water Management</h3>
+                  <ul className="space-y-2 mb-4 text-gray-600">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Soil Testing & Analysis</strong>: Mobile lab services for on-site testing</span>
                     </li>
-                    <li>
-                      <strong>Real-Time Price Tracking:</strong> AI-driven price analysis
-                      ensures fair market rates for farmers.
-                    </li>
-                    <li>
-                      <strong>GreenHeart Logistics Support:</strong> Fast and secure
-                      transportation of produce from farm to market.
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>IoT-Based Water Management</strong>: Optimize water usage with smart sensors</span>
                     </li>
                   </ul>
+                  <a href="/services/soil-management" className="inline-block px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-400 text-white rounded-full text-sm font-medium hover:from-green-600 hover:to-emerald-500 transition-all duration-300">
+                    Learn More
+                  </a>
                 </div>
+              </div>
 
-                {/* 1.6 Expert Support & Training */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Expert Support &amp; Training
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>24/7 Farming Assistance:</strong> Connect with agriculture
-                      specialists for expert guidance.
+              {/* 3. Drone Services Card */}
+              <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
+                <div className="h-40 overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-400">
+                  <img src="/drone-services.jpg" alt="Drone Services" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-green-700">Automated Farm Monitoring & Drones</h3>
+                  <ul className="space-y-2 mb-4 text-gray-600">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Drone-Based Surveillance</strong>: AI drones for crop monitoring</span>
                     </li>
-                    <li>
-                      <strong>Training &amp; Workshops:</strong> Digital literacy programs
-                      on modern farming techniques, government policies, and financial
-                      management.
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Automated Crop Spraying</strong>: Precision pesticide distribution</span>
                     </li>
                   </ul>
+                  <a href="/services/drone-monitoring" className="inline-block px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-400 text-white rounded-full text-sm font-medium hover:from-emerald-600 hover:to-teal-500 transition-all duration-300">
+                    Learn More
+                  </a>
+                </div>
+              </div>
+
+              {/* 4. Farm Lease Card */}
+              <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
+                <div className="h-40 overflow-hidden bg-gradient-to-r from-teal-500 to-cyan-400">
+                  <img src="/farm-lease.jpg" alt="Farm Lease" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-green-700">Farm Lease & Financial Assistance</h3>
+                  <ul className="space-y-2 mb-4 text-gray-600">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Land Leasing & Management</strong>: Tech-equipped farm leasing</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Agri-Fintech Solutions</strong>: Insurance and financial advisory</span>
+                    </li>
+                  </ul>
+                  <a href="/services/farm-finance" className="inline-block px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-400 text-white rounded-full text-sm font-medium hover:from-teal-600 hover:to-cyan-500 transition-all duration-300">
+                    Learn More
+                  </a>
+                </div>
+              </div>
+
+              {/* 5. Market Integration Card */}
+              <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
+                <div className="h-40 overflow-hidden bg-gradient-to-r from-cyan-500 to-green-400">
+                  <img src="/marketplace.jpg" alt="Marketplace" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-green-700">Farm-to-Market & Marketplace</h3>
+                  <ul className="space-y-2 mb-4 text-gray-600">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Direct Selling Platform</strong>: GreenHeart Agri-Marketplace</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Real-Time Price Tracking</strong>: Fair market rates</span>
+                    </li>
+                  </ul>
+                  <a href="/marketplace" className="inline-block px-4 py-2 bg-gradient-to-r from-cyan-500 to-green-400 text-white rounded-full text-sm font-medium hover:from-cyan-600 hover:to-green-500 transition-all duration-300">
+                    Visit Marketplace
+                  </a>
+                </div>
+              </div>
+
+              {/* 6. Expert Support Card */}
+              <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
+                <div className="h-40 overflow-hidden bg-gradient-to-r from-green-500 to-green-400">
+                  <img src="/training.jpg" alt="Expert Support" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-green-700">Expert Support & Training</h3>
+                  <ul className="space-y-2 mb-4 text-gray-600">
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>24/7 Farming Assistance</strong>: Expert agriculture guidance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span><strong>Training & Workshops</strong>: Digital literacy in farming</span>
+                    </li>
+                  </ul>
+                  <a href="/training" className="inline-block px-4 py-2 bg-gradient-to-r from-green-500 to-green-400 text-white rounded-full text-sm font-medium hover:from-green-600 hover:to-green-500 transition-all duration-300">
+                    Join Workshops
+                  </a>
                 </div>
               </div>
             </div>
 
-            {/* Services for Assigned Teams & Admins */}
-            <div>
-              <h2 className="text-2xl font-bold text-green-600 mb-6">
-                Services for Assigned Teams &amp; Admins
-              </h2>
-              <div className="space-y-6">
-                {/* 2.1 AI-Based Farm Management System */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    AI-Based Farm Management System
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Real-Time Farm Monitoring Dashboard:</strong> Displays farm
-                      boundaries, soil data, weather conditions, crop health, and
-                      financial insights.
-                    </li>
-                    <li>
-                      <strong>Automated Risk Alerts:</strong> AI-driven pest, disease, and
-                      climate alerts enable proactive interventions.
-                    </li>
-                  </ul>
-                </div>
-
-                {/* 2.2 Resource Allocation & Expert Assignments */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Resource Allocation &amp; Expert Assignments
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Team Assignment System:</strong> Admins can assign agricultural
-                      specialists based on expertise and requirements.
-                    </li>
-                    <li>
-                      <strong>Service Request Management:</strong> Farmers’ service requests
-                      are tracked, assigned, and completed efficiently.
-                    </li>
-                  </ul>
-                </div>
-
-                {/* 2.3 Data Analytics & Decision Support */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Data Analytics &amp; Decision Support
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Predictive Analytics for Yield Optimization:</strong> AI-driven
-                      insights help maximize crop yield with minimal resource wastage.
-                    </li>
-                    <li>
-                      <strong>Supply Chain &amp; Market Trends Analysis:</strong> Data intelligence
-                      predicts market trends, crop demands, and pricing strategies.
-                    </li>
-                  </ul>
-                </div>
-
-                {/* 2.4 Smart Logistics & Distribution */}
-                <div className="p-6 bg-white rounded-lg shadow hover:shadow-xl transition duration-300">
-                  <h3 className="text-xl font-semibold mb-2">
-                    Smart Logistics &amp; Distribution
-                  </h3>
-                  <ul className="list-disc list-inside text-gray-600 space-y-1">
-                    <li>
-                      <strong>Automated Transportation Scheduling:</strong> Ensures efficient
-                      farm-to-market logistics.
-                    </li>
-                    <li>
-                      <strong>Quality Assurance &amp; Compliance Monitoring:</strong> Guarantees
-                      produce meets industry standards before market delivery.
-                    </li>
-                  </ul>
-                </div>
-              </div>
+            {/* CTA Button */}
+            <div className="mt-12 text-center">
+              <a href="/contact" className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-400 text-white font-medium rounded-full hover:from-green-700 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <span>Request Farm Services</span>
+                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+              </a>
             </div>
+          </div>
+
+          {/* Admin Services Summary */}
+          <div className="mt-16 p-6 bg-gradient-to-r from-green-100 to-emerald-50 rounded-xl shadow-sm">
+            <h2 className="text-2xl font-bold mb-4 text-green-700">For Assigned Teams &amp; Admins</h2>
+            <p className="text-gray-700 mb-4">
+              Our comprehensive admin tools include AI-based farm management systems, resource allocation tools,
+              data analytics platforms, and smart logistics management. These services empower our teams to deliver
+              exceptional support to farmers.
+            </p>
+            <a href="/admin-services" className="text-green-600 hover:text-green-800 font-medium inline-flex items-center">
+              Learn more about admin services
+              <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
           </div>
 
           {/* Why These Services Matter */}
