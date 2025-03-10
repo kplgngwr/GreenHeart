@@ -3,7 +3,6 @@ import missionImage from '/mission.png';
 import visionImage from '/vision.png';
 import team1Image from '/team1.jpg';
 import team2Image from '/team2.jpg';
-import team3Image from '/team3.jpg';
 
 function Aboutus() {
   return (
