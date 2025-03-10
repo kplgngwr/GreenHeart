@@ -15,7 +15,7 @@ function Navbar() {
       <div className="h-full py-2">
         <img src={logo} alt="Logo" className="max-h-14 w-auto" />
       </div>
-
+      
       {/* Mobile menu button */}
       <button onClick={toggleMenu} className="md:hidden text-gray-800 text-2xl">
         {isMenuOpen ? <FaTimes /> : <FaBars />}
