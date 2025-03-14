@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaShoppingCart, FaBell, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '/logo1.png';
+import { useFirebase } from '../context/firebase';
 
 function Navbar() {
+  const { isLoggedIn, signOut } = useFirebase();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -45,8 +47,26 @@ function Navbar() {
         <FaShoppingCart className="text-xl md:text-2xl text-gray-800 hover:text-blue-500 cursor-pointer" />
         <FaBell className="text-xl md:text-2xl text-gray-800 hover:text-blue-500 cursor-pointer" />
         <FaUserCircle className="text-xl md:text-2xl text-gray-800 hover:text-blue-500 cursor-pointer" />
-        <button className="px-2 py-1 md:px-4 md:py-2 text-sm md:text-base bg-blue-500 text-white rounded-lg hover:bg-blue-600">Sign Up</button>
-        <button className="px-2 py-1 md:px-4 md:py-2 text-sm md:text-base bg-green-500 text-white rounded-lg hover:bg-green-600">Login</button>
+        
+        {!isLoggedIn && (
+          <>
+            <NavLink to="/signup" className="px-2 py-1 md:px-4 md:py-2 text-sm md:text-base bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+              Sign Up
+            </NavLink>
+            <NavLink to="/signin" className="px-2 py-1 md:px-4 md:py-2 text-sm md:text-base bg-green-500 text-white rounded-lg hover:bg-green-600">
+              Login
+            </NavLink>
+          </>
+        )}
+
+        {isLoggedIn && (
+          <button
+            onClick={signOut}
+            className="px-2 py-1 md:px-4 md:py-2 text-sm md:text-base bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
+          >
+            Logout
+          </button>
+        )}
       </div>
     </header>
   );
