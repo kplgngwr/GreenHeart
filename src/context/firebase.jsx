@@ -48,15 +48,51 @@ const googleProvider = new GoogleAuthProvider();
 
 export const FirebaseProvider = (props) => {
   const [user, setUser] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setUser(user ? user : null);
+    const fetchUserProfile = async (authUser) => {
+      if (authUser) {
+        try {
+          const userProfileRef = doc(firestore, "Profiles", authUser.uid);
+          const userProfileSnap = await getDoc(userProfileRef);
+          
+          if (userProfileSnap.exists()) {
+            const profileData = userProfileSnap.data();
+            setUserDetails({
+              ...profileData,
+              uid: authUser.uid,
+              email: authUser.email
+            });
+          } else {
+            setUserDetails(null);
+          }
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+          setUserDetails(null);
+        }
+      } else {
+        setUserDetails(null);
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser ? authUser : null);
+      fetchUserProfile(authUser);
     });
+
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
   }, []);
 
   const isLoggedIn = Boolean(user);
+
+  // Get user details
+  const getUserDetails = async () => {
+    console.log(userDetails)
+    return userDetails;
+  };
 
   // Enhanced Sign-Up with Email & Password: accepts additional fields 'name' and 'role'
   const signUpWithEmailAndPassword = async (email, password, name, role = "Consumer") => {
@@ -70,6 +106,14 @@ export const FirebaseProvider = (props) => {
         role: role,
         email: result.user.email,
         createdAt: new Date(),
+      });
+
+      // Update local user details
+      setUserDetails({
+        name,
+        role,
+        email: result.user.email,
+        uid: result.user.uid
       });
 
       // Navigate to a welcome page or dashboard after successful sign-up
@@ -100,8 +144,9 @@ export const FirebaseProvider = (props) => {
     firebaseSignOut(auth)
       .then(() => {
         setUser(null);
+        setUserDetails(null);
         // Use navigate to redirect after sign-out
-        navigate("/login");
+        navigate("/signin");
       })
       .catch((error) => {
         console.error("Error signing out:", error);
@@ -133,6 +178,9 @@ export const FirebaseProvider = (props) => {
         signinWithGoogle,
         signUpWithEmailAndPassword,
         signInWithEmailAndPassword: signInWithEmailAndPasswordFn,
+        getUserDetails,
+        user,
+        userDetails
       }}
     >
       {props.children}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import appleImage from '/apple.jpeg';
 import orangeImage from '/oranges.png';
 import spinachImage from '/spinach.jpg';
@@ -6,34 +6,57 @@ import strawberryImage from '/strawberry.jpg';
 import tomatoImage from '/tomato.jpg';
 import { FaSeedling, FaAward, FaTractor, FaPhoneAlt } from 'react-icons/fa';
 import { FaCartShopping } from "react-icons/fa6";
+import { useFirebase } from '../context/firebase';
 
 function Market() {
-  const [activeRole, setActiveRole] = useState('Buyer');
+  const { getUserDetails } = useFirebase();
+  const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const details = await getUserDetails();
+        if (details) {
+          setUserDetails(details);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserDetails();
+  }, [getUserDetails]);
+
+  // If loading, show a loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  // No user logged in
+  if (!userDetails) {
+    return (
+      <div className="p-10 bg-gray-100 text-center">
+        <h6 className="text-red-600 uppercase tracking-wide">Access Denied</h6>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Please Log In to Access Market Features
+        </h1>
+        <p className="text-gray-700">
+          You need to be logged in to view market content. Please sign in to continue.
+        </p>
+      </div>
+    );
+  }
+
+  // Render content based on user role
   return (
     <div className="w-full">
-      {/* Role Navigation */}
-      <nav className="bg-white shadow px-4 py-3 flex justify-center space-x-4">
-        <button
-          onClick={() => setActiveRole('Buyer')}
-          className={`px-4 py-2 rounded ${activeRole === 'Buyer' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Buyer View
-        </button>
-        <button
-          onClick={() => setActiveRole('Farmer')}
-          className={`px-4 py-2 rounded ${activeRole === 'Farmer' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Farmer View
-        </button>
-        <button
-          onClick={() => setActiveRole('Admin')}
-          className={`px-4 py-2 rounded ${activeRole === 'Admin' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-        >
-          Admin View
-        </button>
-      </nav>
-
       {/* Hero Section (common to all roles) */}
       <div
         className="bg-cover bg-center h-52 flex items-center pl-10 text-white"
@@ -52,8 +75,8 @@ function Market() {
         </div>
       </div>
 
-      {/* Buyer View */}
-      {activeRole === 'Buyer' && (
+      {/* Consumer/Buyer View */}
+      {userDetails.role === 'Consumer' && (
         <>
           {/* Marketplace Landing Page */}
           <div className="p-10 bg-gray-100 text-center">
@@ -138,7 +161,7 @@ function Market() {
       )}
 
       {/* Farmer View */}
-      {activeRole === 'Farmer' && (
+      {userDetails.role === 'Farmer' && (
         <div className="p-10 bg-gray-100 text-center">
           <h6 className="text-green-600 uppercase tracking-wide">Farmer Dashboard</h6>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -159,7 +182,7 @@ function Market() {
       )}
 
       {/* Admin View */}
-      {activeRole === 'Admin' && (
+      {userDetails.role === 'Admin' && (
         <div className="p-10 bg-gray-100 text-center">
           <h6 className="text-green-600 uppercase tracking-wide">Admin Dashboard</h6>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">

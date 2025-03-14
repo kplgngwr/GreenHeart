@@ -51,6 +51,12 @@ const SignInPage = () => {
             Sign In
           </button>
         </form>
+        <p className="mt-4 text-center">
+          If you don't have an account?{' '}
+          <a href="/signup" className="text-green-600 font-semibold hover:underline">
+            Signup
+          </a>
+        </p>
       </div>
     </div>
   );

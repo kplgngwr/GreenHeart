@@ -16,6 +16,8 @@ import spinachImage from '/spinach.jpg';
 import strawberryImage from '/strawberry.jpg';
 import tomatoImage from '/tomato.jpg';
 import { FaCartShopping } from "react-icons/fa6";
+import { useFirebase } from '../context/firebase';
+
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
@@ -186,8 +188,6 @@ function FarmerDashboard() {
 // Marketplace/Buyer Dashboard Component
 // ---------------------
 function MarketplaceDashboard() {
-
-
   return (
     <div className="p-10 bg-gray-100 text-center">
       <h6 className="text-green-600 uppercase tracking-wide">E-Market</h6>
@@ -223,48 +223,58 @@ function MarketplaceDashboard() {
 // Main Dashboard Component with Role Switching
 // ---------------------
 function Dashboard() {
-  const [activeRole, setActiveRole] = useState('Admin');
+  const { getUserDetails } = useFirebase();
+  const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const details = await getUserDetails();
+        if (details) {
+          setUserDetails(details);
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserDetails();
+  }, [getUserDetails]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-green-500"></div>
+      </div>
+    );
+  }
+
+  // No user logged in
+  if (!userDetails) {
+    return (
+      <div className="p-10 bg-gray-100 text-center">
+        <h6 className="text-red-600 uppercase tracking-wide">Access Denied</h6>
+        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+          Please Log In to Access Dashboard
+        </h1>
+        <p className="text-gray-700">
+          You need to be logged in to view dashboard content. Please sign in to continue.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Role Navigation */}
-      <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-center space-x-4">
-          <button
-            className={`px-4 py-2 rounded ${activeRole === 'Admin'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setActiveRole('Admin')}
-          >
-            Admin View
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${activeRole === 'Farmer'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setActiveRole('Farmer')}
-          >
-            Farmer View
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${activeRole === 'Marketplace'
-                ? 'bg-green-600 text-white'
-                : 'bg-gray-200 text-gray-700'
-              }`}
-            onClick={() => setActiveRole('Marketplace')}
-          >
-            Marketplace/Buyer View
-          </button>
-        </div>
-      </div>
-
       {/* Render Dashboard According to Role */}
       <div className="max-w-7xl mx-auto mt-6">
-        {activeRole === 'Admin' && <AdminDashboard />}
-        {activeRole === 'Farmer' && <FarmerDashboard />}
-        {activeRole === 'Marketplace' && <MarketplaceDashboard />}
+        {userDetails.role === 'Admin' && <AdminDashboard />}
+        {userDetails.role === 'Farmer' && <FarmerDashboard />}
+        {userDetails.role === 'Consumer' && <MarketplaceDashboard />}
       </div>
     </div>
   );
