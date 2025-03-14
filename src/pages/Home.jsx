@@ -1,17 +1,4 @@
 import React from 'react';
-import grainImage from '/r1.png';
-import nutsImage from '/r2.png';
-import greenCoffeeImage from '/r3.png';
-import oliveImage from '/r4.png';
-import heroImage from '/heroimg1.jpg';
-import thumbnailImage from '/Thumbnail.png';
-import workflowImage from '/workflow.png';
-import workingImage from '/WORKING.jpg';
-import servicesImage from '/2..png';
-import feature1Image from '/1.png';
-import feature2Image from '/2.png';
-import feature3Image from '/3.png';
-import feature4Image from '/4.png';
 import { Cpu, Monitor, BarChart, ShoppingCart, Leaf, MapPin, Quote, TrendingUp, Truck, ArrowRight, ArrowDown, Users, Briefcase, ShoppingBag } from 'lucide-react';
 
 const features = [
@@ -135,27 +122,12 @@ function Home() {
         <p className="text-lg text-green-700 mt-3">Green Heart Marketplace is a digital B2B platform that simplifies agricultural transactions, ensuring fair prices and efficient delivery.</p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-10 p-10">
-        <div className="w-1/3 shadow-lg rounded-lg overflow-hidden bg-white p-5">
-          <img src={heroImage} alt="Agriculture" className="w-full h-auto rounded-lg" />
-        </div>
-        <div className="w-1/3 flex flex-col justify-center items-center">
-          <p className="text-gray-700 text-2xl font-bold text-center ">Our Vision</p>
-          <p className="text-gray-700 text-xl font-semibold text-center "> To create a thriving agricultural ecosystem where farmers are empowered, consumers have access to fresh, quality produce, and the planet is protected.</p>
-          <div className="flex justify-center items-center mt-4 space-x-4">
-            <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-transform transform hover:scale-110">Join Us</button>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-transform transform hover:scale-110">Learn More</button>
-          </div>
-
-        </div>
-      </div>
-
       <section className="py-16 bg-gray-50">
-        <div className="container  px-4">
+        <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
             Key Features
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center max-w-6xl mx-auto">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -181,6 +153,7 @@ function Home() {
           </div>
         </div>
       </section>
+
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
@@ -211,6 +184,7 @@ function Home() {
           </div>
         </div>
       </section>
+
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
@@ -236,59 +210,61 @@ function Home() {
           </div>
         </div>
       </section>
+
       <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-          Testimonials
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transition transform hover:-translate-y-2 hover:shadow-2xl"
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+            Testimonials
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transition transform hover:-translate-y-2 hover:shadow-2xl"
+              >
+                <Quote className="w-8 h-8 text-green-500 mb-4" />
+                <p className="text-gray-600 italic">
+                  "{testimonial.text}"
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 ">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold mb-4">
+            Ready to Revolutionize Your Farm?
+          </h2>
+          <p className="text-lg mb-8">
+            Join GreenHeart and start revolutionizing your farm today. Experience our innovative platform firsthand and transform your agricultural practices.
+          </p>
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-8">
+            <a
+              href="/demo"
+              className="px-6 py-3 border-2 bg-white text-green-600 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
             >
-              <Quote className="w-8 h-8 text-green-500 mb-4" />
-              <p className="text-gray-600 italic">
-                "{testimonial.text}"
-              </p>
-            </div>
-          ))}
+              Request a Demo
+            </a>
+            <a
+              href="/join"
+              className="px-6 py-3 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition duration-300"
+            >
+              Join GreenHeart and Start Revolutionizing Your Farm Today
+            </a>
+          </div>
+          <p className="text-sm">
+            For businesses, investors, or potential collaborators, please{' '}
+            <a
+              href="/contact"
+              className="underline font-medium hover:text-gray-200"
+            >
+              contact us
+            </a>.
+          </p>
         </div>
-      </div>
-    </section>
-    <section className="py-16 ">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl font-bold mb-4">
-          Ready to Revolutionize Your Farm?
-        </h2>
-        <p className="text-lg mb-8">
-          Join GreenHeart and start revolutionizing your farm today. Experience our innovative platform firsthand and transform your agricultural practices.
-        </p>
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-8">
-          <a
-            href="/demo"
-            className="px-6 py-3 border-2 bg-white text-green-600 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
-          >
-            Request a Demo
-          </a>
-          <a
-            href="/join"
-            className="px-6 py-3 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition duration-300"
-          >
-            Join GreenHeart and Start Revolutionizing Your Farm Today
-          </a>
-        </div>
-        <p className="text-sm">
-          For businesses, investors, or potential collaborators, please{' '}
-          <a
-            href="/contact"
-            className="underline font-medium hover:text-gray-200"
-          >
-            contact us
-          </a>.
-        </p>
-      </div>
-    </section>
+      </section>
     </div>
   );
 }

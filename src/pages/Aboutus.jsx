@@ -3,7 +3,6 @@ import missionImage from '/mission.png';
 import visionImage from '/vision.png';
 import team1Image from '/team1.jpg';
 import team2Image from '/team2.jpg';
-import team3Image from '/team3.jpg';
 
 function Aboutus() {
   return (
@@ -25,7 +24,7 @@ function Aboutus() {
           <img src={visionImage} alt="Our Vision" className="w-72 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105" />
           <div className="max-w-lg">
             <h2 className="text-5xl font-bold text-green-700">Our Vision</h2>
-            <p className="text-gray-600 font-semibold">To create a world where agriculture is sustainable, transparent, and beneficial for all stakeholders involved.</p>
+            <p className="text-gray-600 font-semibold">To create a world where agriculture is sustainable, transparent, and beneficial for all stakeholders involved and a thriving agricultural ecosystem where farmers are empowered, consumers have access to fresh, quality produce, and the planet is protected.</p>
           </div>
         </div>
       </section>
@@ -42,11 +41,6 @@ function Aboutus() {
             <img src={team2Image} alt="Kapil Gangwar" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
             <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Kapil Gangwar</h3>
             <p className="text-gray-600 font-bold">COO</p>
-          </div>
-          <div className="text-center animate-fadeIn">
-            <img src={team3Image} alt="Vasu" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Vasu</h3>
-            <p className="text-gray-600 font-bold">CFO</p>
           </div>
         </div>
       </div>
