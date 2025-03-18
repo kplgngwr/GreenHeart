@@ -474,7 +474,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Render Dashboard According to Role */}
-      <div className="max-w-7xl mx-auto mt-6">
+      <div className="max-w-7xl mx-auto ">
         {userDetails.role === 'Admin' && <AdminDashboard />}
         {userDetails.role === 'Farmer' && <FarmerDashboard />}
         {userDetails.role === 'Consumer' && <MarketplaceDashboard />}
