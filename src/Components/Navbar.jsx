@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { FaShoppingCart, FaBell, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '/logo1.png';
 import { useFirebase } from '../context/firebase';
 
 function Navbar() {
-  const { isLoggedIn, signOut } = useFirebase();
+  const { isLoggedIn, signOut, getUserDetails } = useFirebase();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (isLoggedIn) {
+        const details = await getUserDetails();
+        setUserDetails(details);
+      }
+    };
+    fetchUserDetails();
+  }, [isLoggedIn, getUserDetails]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -36,6 +47,7 @@ function Navbar() {
         <NavLink to="/dashboard" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Dashboard</NavLink>
         <NavLink to="/aboutus" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>About Us</NavLink>
       </nav>
+        
         {!isLoggedIn && (
             <div className="lg:flex hidden ">
               <NavLink to="/signup" className="px-3  inline py-1.5   rounded-lg text-blue-600  font-bold transition-colors">
@@ -48,12 +60,17 @@ function Navbar() {
           )}
 
           {isLoggedIn && (
-            <button
-              onClick={signOut}
-              className="px-3 py-1.5 text-sm font-medium bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-            >
-              Logout
-            </button>
+            <div className="lg:flex hidden  items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                {userDetails?.name ? userDetails.name.charAt(0).toUpperCase() : '?'}
+              </div>
+              <button
+                onClick={signOut}
+                className="px-3 py-1.5 text-sm font-medium bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           )}
 
       {/* Navigation links - mobile */}
