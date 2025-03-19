@@ -37,16 +37,53 @@
     padding: 20px;
 }
 
+/* Base Typography */
+:root {
+    font-size: 16px;
+}
+
+/* Responsive Typography */
+@media screen and (max-width: 768px) {
+    :root {
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    :root {
+        font-size: 12px;
+    }
+}
+
 /* Responsive Text */
 .overlay h1 {
-    font-size: 5rem;
+    font-size: clamp(2.5rem, 8vw, 5rem);
     font-weight: bold;
-    max-width: 80%;
+    max-width: 90%;
+    line-height: 1.2;
 }
 
 .overlay h2 {
-    font-size: 2.5rem;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
     color: #16bd64;
-    margin-top: 20px;
-    margin-bottom: 50px;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.3;
+}
+
+/* Global Responsive Text Classes */
+.text-responsive-xl {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+}
+
+.text-responsive-lg {
+    font-size: clamp(1.25rem, 4vw, 2rem);
+}
+
+.text-responsive-md {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+}
+
+.text-responsive-sm {
+    font-size: clamp(0.875rem, 2vw, 1rem);
 }

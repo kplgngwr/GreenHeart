@@ -8,6 +8,9 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [role, setRole] = useState('Consumer'); // Default role is Consumer
+  const [deviceId, setDeviceId] = useState('');
+  const [farmSize, setFarmSize] = useState('');
+  const [location, setLocation] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -15,9 +18,17 @@ const SignUpPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signUpWithEmailAndPassword(email, password, name, role);
+      // For farmers, pass additional farmSize and location parameters
+      if (role === "Farmer") {
+        await signUpWithEmailAndPassword(email, password, name, role, deviceId, farmSize, location);
+      } else {
+        await signUpWithEmailAndPassword(email, password, name, role, deviceId);
+      }
       toast.success("Sign up successful! Please sign in.");
-      navigate("/signin");
+      // Redirect to signin after a short delay (e.g., 3 seconds)
+      setTimeout(() => {
+        navigate("/signin");
+      }, 3000);
     } catch (err) {
       setError(err.message);
       toast.error(err.message);
@@ -25,7 +36,7 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="lg:min-h-screen min-h-[45rem] flex items-center justify-center bg-gray-100">
       <Toaster />
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
@@ -55,6 +66,44 @@ const SignUpPage = () => {
               <option value="Admin">Admin</option>
               <option value="Farmer">Farmer</option>
             </select>
+          </div>
+          {/* Conditionally show extra fields for farmers */}
+          {role === "Farmer" && (
+            <>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Farm Size</label>
+                <input
+                  type="text"
+                  value={farmSize}
+                  onChange={(e) => setFarmSize(e.target.value)}
+                  className="w-full px-3 py-2 border rounded"
+                  placeholder="Enter your farm size (e.g., 5 acres)"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 mb-2">Location</label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full px-3 py-2 border rounded"
+                  placeholder="Enter your farm location"
+                  required
+                />
+              </div>
+            </>
+          )}
+          {/* Device ID Input */}
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2">Device ID</label>
+            <input
+              type="text"
+              value={deviceId}
+              onChange={(e) => setDeviceId(e.target.value)}
+              className="w-full px-3 py-2 border rounded"
+              placeholder="Enter your device ID (if applicable)"
+            />
           </div>
           {/* Email Input */}
           <div className="mb-4">

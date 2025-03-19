@@ -21,6 +21,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// Import Realtime Database functions
+import { getDatabase, ref as dbRef, child, get } from "firebase/database";
 
 // Create Firebase context
 const FirebaseContext = createContext(null);
@@ -45,6 +47,43 @@ export const auth = getAuth(app);
 const firestore = getFirestore(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
+// Initialize Realtime Database
+const database = getDatabase(app);
+
+/**
+ * Function to fetch all land data from Realtime Database under the "devices" path.
+ */
+export async function getAllLandData() {
+  const dbReference = dbRef(database);
+  const snapshot = await get(child(dbReference, "devices"));
+  if (snapshot.exists()) {
+    console.log(snapshot.val())
+    return snapshot.val();
+  } else {
+    console.log("No data available");
+    return {};
+  }
+}
+getAllLandData()
+
+/**
+ * Function to fetch all documents from the "Profiles" collection in Firestore.
+ */
+export async function getAllProfilesData() {
+  try {
+    const profilesSnapshot = await getDocs(collection(firestore, "Profiles"));
+    const profilesData = profilesSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log(profilesData)
+    return profilesData;
+  } catch (error) {
+    console.error("Error fetching profiles data:", error);
+    return [];
+  }
+}
+getAllProfilesData()
 
 export const FirebaseProvider = (props) => {
   const [user, setUser] = useState(null);
@@ -57,13 +96,13 @@ export const FirebaseProvider = (props) => {
         try {
           const userProfileRef = doc(firestore, "Profiles", authUser.uid);
           const userProfileSnap = await getDoc(userProfileRef);
-          
+          console.log(userProfileSnap.data())
           if (userProfileSnap.exists()) {
             const profileData = userProfileSnap.data();
             setUserDetails({
               ...profileData,
               uid: authUser.uid,
-              email: authUser.email
+              email: authUser.email,
             });
           } else {
             setUserDetails(null);
@@ -90,34 +129,47 @@ export const FirebaseProvider = (props) => {
 
   // Get user details
   const getUserDetails = async () => {
-    console.log(userDetails)
+    console.log(userDetails);
     return userDetails;
   };
 
-  // Enhanced Sign-Up with Email & Password: accepts additional fields 'name' and 'role'
-  const signUpWithEmailAndPassword = async (email, password, name, role = "Consumer") => {
+  // Enhanced Sign-Up with Email & Password: accepts additional fields 'name', 'role', and 'deviceId'
+  const signUpWithEmailAndPassword = async (
+    email,
+    password,
+    name,
+    role = "Consumer",
+    deviceId,
+    farmSize,
+    location
+  ) => {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      setUser(result.user);
-
       // Create a new profile document in Firestore using the user's UID
       await setDoc(doc(firestore, "Profiles", result.user.uid), {
         name: name,
         role: role,
         email: result.user.email,
         createdAt: new Date(),
+        deviceId: deviceId,
+        ...(role === "Farmer" && { farmSize, location }), // Include these only for farmers
       });
 
-      // Update local user details
+      // Optionally update local user details if needed (or clear them)
       setUserDetails({
         name,
         role,
         email: result.user.email,
-        uid: result.user.uid
+        uid: result.user.uid,
+        deviceId: deviceId,
+        ...(role === "Farmer" && { farmSize, location }),
       });
 
-      // Navigate to a welcome page or dashboard after successful sign-up
-      navigate("/dashboard");
+      // Sign out immediately so the user isn't kept signed in
+      await firebaseSignOut(auth);
+
+      // Navigate to the sign-in page
+      navigate("/signin");
       return result.user;
     } catch (error) {
       console.error("Error signing up with email and password:", error);
@@ -125,11 +177,12 @@ export const FirebaseProvider = (props) => {
     }
   };
 
+
   // Sign In with Email & Password
   const signInWithEmailAndPasswordFn = async (email, password) => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log(result)
+      console.log(result);
       setUser(result.user);
       // Navigate to dashboard or home page after successful sign-in
       navigate("/dashboard");
@@ -180,7 +233,9 @@ export const FirebaseProvider = (props) => {
         signInWithEmailAndPassword: signInWithEmailAndPasswordFn,
         getUserDetails,
         user,
-        userDetails
+        userDetails,
+        getAllLandData,     // Function to get data from Realtime Database (devices)
+        getAllProfilesData, // Function to get all profiles data from Firestore
       }}
     >
       {props.children}
