@@ -91,6 +91,8 @@ function Navbar() {
           <NavLink to="/education" className={({ isActive }) => isActive ? "text-blue-600 font-bold p-2" : "hover:text-blue-500 p-2"} onClick={toggleMenu}>Education</NavLink>
           <NavLink to="/services" className={({ isActive }) => isActive ? "text-blue-600 font-bold p-2" : "hover:text-blue-500 p-2"} onClick={toggleMenu}>Services</NavLink>
           <NavLink to="/dashboard" className={({ isActive }) => isActive ? "text-blue-600 font-bold p-2" : "hover:text-blue-500 p-2"} onClick={toggleMenu}>Dashboard</NavLink>
+          <NavLink to="/resource" className={({ isActive }) => isActive ? "text-blue-600 font-bold p-2" : "hover:text-blue-500 p-2"}>Resource</NavLink>
+          <NavLink to="/research" className={({ isActive }) => isActive ? "text-blue-600 font-bold p-2" : "hover:text-blue-500 p-2"}>Reasearch</NavLink>
           <NavLink to="/aboutus" className={({ isActive }) => isActive ? "text-blue-600 font-bold p-2" : "hover:text-blue-500 p-2"} onClick={toggleMenu}>About Us</NavLink>
           {!isLoggedIn && (
             <div className="flex flex-col gap-4">
