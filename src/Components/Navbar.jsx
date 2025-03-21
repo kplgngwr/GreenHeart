@@ -42,9 +42,11 @@ function Navbar() {
       <nav className="hidden md:flex items-center space-x-6 text-gray-800 font-semibold">
         <NavLink to="/" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Home</NavLink>
         <NavLink to="/market" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Market</NavLink>
-        <NavLink to="/education" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Education</NavLink>
+        <NavLink to="/education" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Learning</NavLink>
         <NavLink to="/services" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Services</NavLink>
         <NavLink to="/dashboard" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Dashboard</NavLink>
+        <NavLink to="/resource" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Resource</NavLink>
+        <NavLink to="/research" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Reasearch</NavLink>
         <NavLink to="/aboutus" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>About Us</NavLink>
       </nav>
         
