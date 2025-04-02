@@ -138,16 +138,18 @@ export const FirebaseProvider = (props) => {
     email,
     password,
     name,
+    gender, // added gender parameter
     role = "Consumer",
     deviceId,
     farmSize,
-    location
+    location,
   ) => {
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       // Create a new profile document in Firestore using the user's UID
       await setDoc(doc(firestore, "Profiles", result.user.uid), {
         name: name,
+        gender: gender, // include gender
         role: role,
         email: result.user.email,
         createdAt: new Date(),
@@ -158,6 +160,7 @@ export const FirebaseProvider = (props) => {
       // Optionally update local user details if needed (or clear them)
       setUserDetails({
         name,
+        gender, // include gender
         role,
         email: result.user.email,
         uid: result.user.uid,

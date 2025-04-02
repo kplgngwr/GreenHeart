@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-import { ArrowRight, ChevronRight,Check } from 'lucide-react';
+import { ArrowRight, ChevronRight, Check } from 'lucide-react';
 import appleImage from '/apple.jpeg';
 import orangeImage from '/oranges.png';
 import spinachImage from '/spinach.jpg';
@@ -15,6 +15,7 @@ import { FaCartShopping } from "react-icons/fa6";
 import { FaShoppingBasket, FaSeedling, FaChalkboardTeacher, FaVrCardboard, FaMicroscope } from 'react-icons/fa';
 import { getAllLandData, getAllProfilesData, useFirebase } from '../context/firebase';
 import { getFirestore, updateDoc, doc } from 'firebase/firestore';
+import { Toaster } from 'react-hot-toast';
 
 // Fix for default icon not showing
 delete L.Icon.Default.prototype._getIconUrl;
@@ -29,6 +30,9 @@ function AdminDashboard() {
   const [profiles, setProfiles] = useState([]);
   const [selectedLand, setSelectedLand] = useState(null);
   const [selectedDevices, setSelectedDevices] = useState({});
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [previousDevice, setPreviousDevice] = useState("");
+
 
   // Initialize Firestore instance for updating user profiles
   const firestoreInstance = getFirestore();
@@ -48,6 +52,7 @@ function AdminDashboard() {
     async function fetchProfiles() {
       try {
         const profilesData = await getAllProfilesData();
+        console.log(profilesData)
         setProfiles(profilesData);
       } catch (error) {
         console.error("Error fetching profiles data:", error);
@@ -56,78 +61,111 @@ function AdminDashboard() {
     fetchProfiles();
   }, []);
 
-  // Function to allocate a device to a user (update user's deviceId)
-  const allocateDeviceToUserHandler = async (profileId, deviceId) => {
-    if (!deviceId) return;
+  // Handle user selection
+  const handleUserChange = (e) => {
+    const userId = e.target.value;
+    setSelectedUser(userId);
+
+    // Find the selected user profile and set the previously allocated device
+    const userProfile = profiles.find(profile => profile.id === userId);
+    setPreviousDevice(userProfile?.deviceId || "");
+  };
+
+  // Function to allocate or dis-allocate a device to a user
+  const allocateDeviceToUserHandler = async (userId, deviceId) => {
     try {
-      await updateDoc(doc(firestoreInstance, "Profiles", profileId), { deviceId });
+      if (!deviceId) {
+        // If no device is selected, we dis-allocate the current device
+        await updateDoc(doc(firestoreInstance, "Profiles", userId), { deviceId: "" });
+      } else {
+        // If a device is selected, we allocate it to the user
+        await updateDoc(doc(firestoreInstance, "Profiles", userId), { deviceId });
+      }
+
       // Optionally refresh profiles data after update
       const updatedProfiles = await getAllProfilesData();
       setProfiles(updatedProfiles);
+      setPreviousDevice(deviceId); // Update the previous device after allocation
+      toast.success(`Device ${deviceId ? 'allocated' : 'dis-allocated'} successfully!`, {
+        duration: 3000,
+      });
     } catch (error) {
-      console.error("Error allocating device:", error);
+      console.error("Error allocating/dis-allocating device:", error);
     }
   };
 
   return (
     <div className="p-5  h-full">
+      <Toaster />
       {/* Device Allocation Section */}
       <div className="w-full my-6 bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold mb-4">Device Allocation</h2>
-        {profiles.length === 0 ? (
-          <p className="text-gray-500">No profiles found.</p>
-        ) : (
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="px-4 py-2">User Name</th>
-                <th className="px-4 py-2">Email</th>
-                <th className="px-4 py-2">Current Device</th>
-                <th className="px-4 py-2">Allocate Device</th>
-                <th className="px-4 py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
+
+        {/* User selection dropdown */}
+        <div className="flex justify-between">
+          <div className="mb-4 w-2/5">
+            <label className="block text-gray-700 mb-2">Select User</label>
+            <select
+              value={selectedUser}
+              onChange={handleUserChange}
+              className="w-full px-3 py-2 border rounded"
+            >
+              <option value="">Select a user</option>
               {profiles.map((profile) => (
-                <tr key={profile.id}>
-                  <td className="px-4 py-2">{profile.name}</td>
-                  <td className="px-4 py-2">{profile.email}</td>
-                  <td className="px-4 py-2">{profile.deviceId || "None"}</td>
-                  <td className="px-4 py-2">
-                    <select
-                      value={selectedDevices[profile.id] || ""}
-                      onChange={(e) =>
-                        setSelectedDevices({
-                          ...selectedDevices,
-                          [profile.id]: e.target.value,
-                        })
-                      }
-                      className="border rounded px-2 py-1"
-                    >
-                      <option value="">Select a device</option>
-                      {lands.map((device) => (
-                        <option key={device.id} value={device.id}>
-                          {device.Crop} (ID: {device.id})
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="px-4 py-2">
-                    <button
-                      onClick={() =>
-                        allocateDeviceToUserHandler(profile.id, selectedDevices[profile.id])
-                      }
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      Allocate
-                    </button>
-                  </td>
-                </tr>
+                <option key={profile.id} value={profile.id}>
+                  {profile.name} ({profile.email})
+                </option>
               ))}
-            </tbody>
-          </table>
-        )}
+            </select>
+          </div>
+
+          {/* Device selection dropdown */}
+          <div className="mb-4 w-2/5">
+            <label className="block text-gray-700 mb-2">Allocate/Dis-allocate Device</label>
+            <select
+              value={selectedDevices[selectedUser] || previousDevice || ""}
+              onChange={(e) => {
+                setSelectedDevices({ ...selectedDevices, [selectedUser]: e.target.value });
+              }}
+              className="w-full px-3 py-2 border rounded"
+              disabled={!selectedUser}
+            >
+              <option value="">Select a device</option>
+              {lands.map((device) => (
+                <option key={device.id} value={device.id}>
+                  {device.Crop} (ID: {device.id})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Action Button */}
+          <div className="grid grid-cols-2 gap-2 h-10 mt-7.5">
+            {/* Allocate Button */}
+            <button
+              onClick={() =>
+                allocateDeviceToUserHandler(selectedUser, selectedDevices[selectedUser] || "")
+              }
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+              disabled={!selectedUser || !selectedDevices[selectedUser]}  // Ensure a device is selected
+            >
+              Allocate
+            </button>
+
+            {/* De-allocate Button */}
+            <button
+              onClick={() =>
+                allocateDeviceToUserHandler(selectedUser, "")  // Passing empty string to dis-allocate
+              }
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              disabled={!selectedUser || !previousDevice}  // Ensure there is a device to de-allocate
+            >
+              De-allocate
+            </button>
+          </div>
+        </div>
       </div>
+
 
       {/* Map & Visualization Section */}
       <div className='flex' >
@@ -174,7 +212,7 @@ function AdminDashboard() {
             ))}
           </MapContainer>
           {/* Legend */}
-          <div className="absolute top-2 right-2 bg-white bg-opacity-80 p-2 rounded shadow-md z-10">
+          <div className="absolute top-28 right-6 bg-white bg-opacity-80 p-2 rounded shadow-md z-10">
             <div className="flex items-center mb-2">
               <span className="w-4 h-4 bg-blue-500 rounded-full inline-block mr-2"></span> Device
             </div>
@@ -209,9 +247,7 @@ function AdminDashboard() {
   );
 }
 
-// ---------------------
 // Farmer Dashboard Component
-// ---------------------
 // Updated FarmerDashboard Component
 function FarmerDashboard() {
   const [lands, setLands] = useState([]);
@@ -220,7 +256,7 @@ function FarmerDashboard() {
 
   // Get userDetails from Firebase context
   const { userDetails } = useFirebase();
-console.log(userDetails)
+  console.log(userDetails)
   // Sample farmer info (for demonstration only)
   const farmer = {
     name: "Rajesh Kumar",
@@ -271,12 +307,33 @@ console.log(userDetails)
               Farm Size: {userDetails.farmSize} • Location: {userDetails.location}
             </p>
           </div>
-          <div className="mt-4 md:mt-0 p-3 bg-white bg-opacity-20 rounded-lg">
-            <div className="text-center">
-              <p className="text-xl font-semibold">{weather.temp}</p>
-              <p>{weather.condition}</p>
-              <p className="text-sm">Today's Weather</p>
+          <div className="mt-4 md:mt-0 p-2 bg-blue-300 text-black bg-opacity-20 rounded-lg">
+            <div className="w-full flex items-center justify-center">
+              {userDetails?.gender ? (
+                userDetails.gender.toLowerCase() === 'male' ? (
+                  <img
+                    src="https://i.postimg.cc/VkpGnh01/male.png"
+                    alt="Male"
+                    className="w-12 h-12 "
+                  />
+                ) : userDetails.gender.toLowerCase() === 'female' ? (
+                  <img
+                    src="https://i.postimg.cc/d3hnhmQD/female1.png"
+                    alt="Female"
+                    className="w-12 h-12 "
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white font-semibold">
+                    {userDetails.gender.charAt(0).toUpperCase()}
+                  </div>
+                )
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white font-semibold">
+                  ?
+                </div>
+              )}
             </div>
+
           </div>
         </div>
       </div>
@@ -496,45 +553,7 @@ console.log(userDetails)
   );
 }
 
-
-// ---------------------
-// Marketplace/Buyer Dashboard Component
-// ---------------------
-function MarketplaceDashboard() {
-  return (
-    <div className="p-10 bg-gray-100 text-center">
-      <h6 className="text-green-600 uppercase tracking-wide">E-Market</h6>
-      <h1 className="text-3xl font-bold text-gray-900">Explore Our Fresh & Organic Products</h1>
-
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-        {[
-          { img: appleImage, name: "Apples", price: "₹80-150/kg" },
-          { img: orangeImage, name: "Oranges", price: "₹40-80/kg" },
-          { img: spinachImage, name: "Spinach", price: "₹40-80/kg" },
-          { img: strawberryImage, name: "Strawberries", price: "₹200-400/kg" },
-          { img: tomatoImage, name: "Tomatoes", price: "₹20-40/kg" }
-        ].map((product, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-5 flex flex-col items-center">
-            <img src={product.img} alt={product.name} className="w-full h-40 object-cover rounded-lg" />
-            <div className="w-full flex justify-between items-center mt-2">
-              <h6 className="text-lg font-semibold ">{product.name}</h6>
-              <h5 className="text-green-600 text-md font-bold">{product.price}</h5>
-            </div>
-            <div className="flex justify-between gap-20 mt-2">
-              <button className="px-3 py-2 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600">View Details</button>
-              <button className="px-3 py-2 bg-green-600 text-white text-md rounded-lg hover:bg-green-700"><FaCartShopping /></button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ---------------------
 // Main Dashboard Component with Role Switching
-// ---------------------
 function Dashboard() {
   const { getUserDetails } = useFirebase();
   const [userDetails, setUserDetails] = useState(null);
@@ -587,7 +606,6 @@ function Dashboard() {
       <div className="max-w-7xl mx-auto ">
         {userDetails.role === 'Admin' && <AdminDashboard />}
         {userDetails.role === 'Farmer' && <FarmerDashboard />}
-        {userDetails.role === 'Consumer' && <MarketplaceDashboard />}
       </div>
     </div>
   );
