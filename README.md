@@ -10,6 +10,7 @@ Green Heart is a platform designed to bridge the gap between farmers and consume
 - Secure payment processing
 - Order tracking and delivery options
 - Reviews and rating system
+- Dashboard or Nutrient and all Analyses
 
 ## Technology Stack
 - **Frontend**: React + Vite
