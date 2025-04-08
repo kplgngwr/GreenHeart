@@ -8,7 +8,7 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [role, setRole] = useState('Consumer'); // Default role is Consumer
-  const [gender, setGender] = useState(''); // New gender state
+  const [gender, setGender] = useState(''); // New gender statel̥
   const [deviceId, setDeviceId] = useState('');
   const [farmSize, setFarmSize] = useState('');
   const [location, setLocation] = useState('');

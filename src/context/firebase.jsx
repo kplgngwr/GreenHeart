@@ -29,13 +29,13 @@ const FirebaseContext = createContext(null);
 
 // Your Firebase configuration here
 const firebaseConfig = {
-  apiKey: "AIzaSyCugLu_wwUY0UeczWWCvagz3DvPhgo4sro",
+  apiKey: "AIzaSyCDUhgidOJeiyDh9eYlq3ZbFYI9gAGrasU",
   authDomain: "greenheart-2025.firebaseapp.com",
   databaseURL: "https://greenheart-2025-default-rtdb.firebaseio.com",
   projectId: "greenheart-2025",
   storageBucket: "greenheart-2025.firebasestorage.app",
   messagingSenderId: "767206203790",
-  appId: "1:767206203790:web:795fadf6feb50b247f04df",
+  appId: "1:767206203790:web:ea664286cd91534b7f04df"
 };
 
 // Custom hook for using Firebase context
