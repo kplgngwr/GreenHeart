@@ -46,8 +46,9 @@ function Navbar() {
         <NavLink to="/services" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Services</NavLink>
         <NavLink to="/dashboard" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Dashboard</NavLink>
         <NavLink to="/resource" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Resource</NavLink>
-        <NavLink to="/research" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Reasearch</NavLink>
+        <NavLink to="/research" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>Research</NavLink>
         <NavLink to="/aboutus" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>About Us</NavLink>
+        <NavLink to="/gis" className={({ isActive }) => isActive ? "text-blue-600 font-bold" : "hover:text-blue-500"}>GIS Data</NavLink>
       </nav>
         
         {!isLoggedIn && (
