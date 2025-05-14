@@ -13,6 +13,7 @@ import SignUpPage from './pages/auth/SignUpPage';
 import SignInPage from './pages/auth/SignInPage';
 import Resource from './pages/Resource';
 import Reasearch from './pages/Reasearch';
+import GIS from './pages/GIS';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -27,6 +28,7 @@ function App() {
         <Route path="/aboutus" element={<Aboutus />} />
         <Route path="/services" element={<Services />} />
         <Route path="/education" element={<Education />} />
+        <Route path="/gis" element={<GIS />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/resource" element={<Resource />} />
