@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
 
 import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, } from '@react-google-maps/api';
@@ -10,22 +10,9 @@ const containerStyle = {
     height: '400px',
 };
 const startingPoint = { lat: 30.762357, lng: 76.598619 };
-const speedLimitZone = {
-    center: { lat: 30.756109, lng: 76.642427 },
-    radius: 500,
-    speedLimit: 30,
-};
+
 
 export default function GIS() {
-    const [mapLoaded, setMapLoaded] = useState(false);
-    const [currentLocation, setCurrentLocation] = useState(null);
-    const [distanceTraveled, setDistanceTraveled] = useState(null);
-    const [directions, setDirections] = useState(null);
-    const [currentSpeed, setCurrentSpeed] = useState(0);
-    const [timestamp, setTimestamp] = useState(null);
-    const [error, setError] = useState(null);
-    const mapRef = useRef(null);
-
     const [monitoringOpen, setMonitoringOpen] = useState(true);
     const [weatherOpen, setWeatherOpen] = useState(false);
     const [overviewOpen, setOverviewOpen] = useState(false);
@@ -37,23 +24,10 @@ export default function GIS() {
     const [lands, setLands] = useState([]);
     const toggle = setter => setter(prev => !prev);
     const tabs = ['Crop info', 'Chart', 'Activities'];
-    const [active, setActive] = useState(tabs[0]);
 
     const [selectedLand, setSelectedLand] = useState(null);
-    const handleMapLoad = map => {
-        mapRef.current = map;
-        setMapLoaded(true);
-    };
+
     const [activeTab, setActiveTab] = useState(tabs[0]);
-    const toRad = v => (v * Math.PI) / 180;
-    const calcDistance = (lat1, lng1, lat2, lng2) => {
-        const R = 6371;
-        const dLat = toRad(lat2 - lat1);
-        const dLng = toRad(lng2 - lng1);
-        const a =
-            Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    };
     useEffect(() => {
         getAllLandData().then((data) => {
             const arr = Object.keys(data).map((k) => ({ id: k, ...data[k] }));
@@ -61,51 +35,84 @@ export default function GIS() {
         });
     }, []);
 
+    // Inside your GIS component, after your map is ready…
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const mapRef = useRef(null);
+    const [geoJsonData, setGeoJsonData] = useState(null);
+    // Handle map load and set map reference
+    const handleMapLoad = useCallback((mapInstance) => {
+        mapRef.current = mapInstance;
+        setMapLoaded(true);
+    }, []);
+
+    const applyStylesToGeoJson = () => {
+        if (mapRef.current && geoJsonData) {
+            mapRef.current.data.setStyle((feature) => {
+                console.log('Applying style to feature:', feature);  // Log each feature being styled
+
+                return {
+                    fillColor: 'green',     // Set the fill color of polygons/areas
+                    fillOpacity: 0.4,       // Adjust the transparency of the fill color
+                    strokeColor: 'blue',    // Set the stroke (border) color
+                    strokeWeight: 2,        // Set the stroke weight (thickness)
+                    strokeOpacity: 1        // Set the stroke opacity
+                };
+            });
+        }
+    };
+    // Fetch the GeoJSON data from the public folder when the map is loaded
+    useEffect(() => {
+        if (mapLoaded) {
+            fetch('/roorkee_pukhta_land.geojson')  // Ensure the GeoJSON file is in the public folder
+                .then(response => response.json())
+                .then(data => {
+                    console.log('GeoJSON Data:', data);  // Log the GeoJSON data to check its structure
+                    setGeoJsonData(data);  // Store the GeoJSON data
+                    mapRef.current.data.addGeoJson(data); // Add the data to the map
+                    applyStylesToGeoJson(); // Apply styles after adding the data
+                })
+                .catch(error => {
+                    console.error("Error loading GeoJSON:", error);
+                });
+        }
+    }, [mapLoaded]);
+
+
     return (
-        <div className="flex h-screen bg-gray-900 text-white">
+        <div className="flex h-screen bg-white text-white">
             {/* Left + Center Panel */}
             <div className="flex flex-1 flex-col gap-4 p-4 overflow-hidden">
                 {/* Satellite + Tabs Container */}
                 <div className="flex flex-1 gap-4 overflow-hidden">
                     {/* Left: Map + Tabs */}
-                    <div className="flex flex-col flex-1 bg-gray-800 rounded-lg overflow-hidden">
+                    <div className="flex flex-col  flex-1  rounded-lg overflow-hidden">
                         {/* Map (fixed height) */}
                         <div className="h-[400px]">
                             <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY}>
-                                {/* Map */}
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
                                     center={startingPoint}
-                                    zoom={12}
-                                    mapTypeId="hybrid"
+                                    zoom={15}
                                     onLoad={handleMapLoad}
+                                    mapTypeId="hybrid"
                                 >
-                                    {/* starting point */}
-                                    <Marker position={startingPoint} />
-                                    {/* current */}
-                                    {currentLocation && (
-                                        <Marker
-                                            position={currentLocation}
-                                            icon={{
-                                                url: 'https://cdn-icons-png.flaticon.com/512/1048/1048329.png',
-                                                scaledSize: new window.google.maps.Size(40, 40),
-                                            }}
-                                        />
-                                    )}
-                                    
+                                    {/* Other map layers or markers */}
                                 </GoogleMap>
                             </LoadScript>
+
+
+
                         </div>
 
                         {/* Tabs (scrollable) */}
-                        <div className="flex-1 overflow-y-auto p-4">
+                        <div className="flex-1 overflow-y-auto p-4 mt-4 rounded-2xl bg-gray-800">
                             {/* Tab Buttons */}
-                            <div className="flex border-b border-gray-600 mb-4">
+                            <div className="flex justify-between border-b border-gray-600 mb-4 w-full">
                                 {tabs.map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
-                                        className={`px-4 py-2 -mb-px ${activeTab === tab
+                                        className={`px-4 py-2 w-full -mb-px ${activeTab === tab
                                             ? "border-b-2 border-blue-500 text-blue-500"
                                             : "text-gray-400 hover:text-white"
                                             }`}
@@ -119,8 +126,8 @@ export default function GIS() {
                             {activeTab === "Crop info" && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {/* Card: Crop Rotation */}
-                                    <div className="bg-gray-700 rounded-lg p-4 space-y-2">
-                                        <div className="flex justify-between items-center">
+                                    <div className="bg-gray-700 rounded-lg  space-y-2">
+                                        <div className="flex justify-between items-center bg-gray-600 text-white px-4 py-2 rounded-t-lg">
                                             <span>Crop rotation</span>
                                             <svg
                                                 className="w-4 h-4 text-gray-400"
@@ -132,17 +139,19 @@ export default function GIS() {
                                                 <path d="M12 8v4l2 2" strokeWidth="2" />
                                             </svg>
                                         </div>
-                                        <p className="text-gray-400 text-sm">Season: Season 2025</p>
-                                        <button className="text-blue-500 text-sm hover:underline">Show all</button>
-                                        <div className="mt-2 p-3 border border-gray-600 rounded-lg text-center text-blue-500 cursor-pointer hover:bg-gray-600">
-                                            + Add crop
+                                        <div className="p-4">
+                                            <p className="text-gray-400 text-sm">Season: Season 2025</p>
+                                            <button className="text-blue-500 text-sm hover:underline">Show all</button>
+                                            <div className="mt-2 p-3 border border-gray-600 rounded-lg text-center text-blue-500 cursor-pointer hover:bg-gray-600">
+                                                + Add crop
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Card: Sown Area */}
-                                    <div className="bg-gray-700 rounded-lg p-4 space-y-2">
-                                        <div className="flex justify-between items-center">
-                                            <span>Sown area detected, %</span>
+                                    <div className="bg-gray-700 rounded-lg  space-y-2">
+                                        <div className="flex justify-between items-center bg-gray-600 text-white px-4 py-2 rounded-t-lg">
+                                            <span className="" >Sown area detected</span>
                                             <svg
                                                 className="w-4 h-4 text-gray-400"
                                                 fill="none"
@@ -153,8 +162,10 @@ export default function GIS() {
                                                 <path d="M12 8v4l2 2" strokeWidth="2" />
                                             </svg>
                                         </div>
-                                        <p className="text-gray-400 text-sm">10 May’25</p>
-                                        <p className="font-semibold">Not sown</p>
+                                        <div className="flex p-4 justify-between items-center">
+                                            <p className="text-gray-400 text-sm">10 May’25</p>
+                                            <p className="text-gray-400 text-sm">Not sown</p>
+                                        </div>
                                     </div>
 
                                     {/* Card: Crop Management Guide */}
