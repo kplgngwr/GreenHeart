@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
-
 import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, } from '@react-google-maps/api';
 
 
@@ -45,31 +44,41 @@ export default function GIS() {
         setMapLoaded(true);
     }, []);
 
-    const applyStylesToGeoJson = () => {
-        if (mapRef.current && geoJsonData) {
-            mapRef.current.data.setStyle((feature) => {
-                console.log('Applying style to feature:', feature);  // Log each feature being styled
+    // const applyStylesToGeoJson = () => {
+    //     if (mapRef.current && geoJsonData) {
+    //         mapRef.current.data.setStyle((feature) => {
+    //             console.log('Applying style to feature:', feature);  // Log each feature being styled
 
-                return {
-                    fillColor: 'green',     // Set the fill color of polygons/areas
-                    fillOpacity: 0.4,       // Adjust the transparency of the fill color
-                    strokeColor: 'blue',    // Set the stroke (border) color
-                    strokeWeight: 2,        // Set the stroke weight (thickness)
-                    strokeOpacity: 1        // Set the stroke opacity
-                };
-            });
-        }
-    };
+    //             return {
+    //                 fillColor: 'blue',     // Set the fill color of polygons/areas
+    //                 fillOpacity: 0.2,       // Adjust the transparency of the fill color
+    //                 strokeColor: 'lightgreen',    // Set the stroke (border) color
+    //                 strokeWeight: 1,        // Set the stroke weight (thickness)
+    //                 strokeOpacity: 1        // Set the stroke opacity
+    //             };
+    //         });
+    //     }
+    // };
     // Fetch the GeoJSON data from the public folder when the map is loaded
     useEffect(() => {
         if (mapLoaded) {
-            fetch('/roorkee_pukhta_land.geojson')  // Ensure the GeoJSON file is in the public folder
+            fetch('/roorkee_pukhta_land.geojson')
                 .then(response => response.json())
                 .then(data => {
-                    console.log('GeoJSON Data:', data);  // Log the GeoJSON data to check its structure
-                    setGeoJsonData(data);  // Store the GeoJSON data
-                    mapRef.current.data.addGeoJson(data); // Add the data to the map
-                    applyStylesToGeoJson(); // Apply styles after adding the data
+                    // Remove any existing data layers before adding new
+                    mapRef.current.data.forEach(feature => {
+                        mapRef.current.data.remove(feature);
+                    });
+                    setGeoJsonData(data);
+                    mapRef.current.data.addGeoJson(data);
+                    // Set style immediately after adding
+                    mapRef.current.data.setStyle({
+                        fillColor: 'blue',
+                        fillOpacity: 0.2,
+                        strokeColor: 'lightgreen',
+                        strokeWeight: 1,
+                        strokeOpacity: 1
+                    });
                 })
                 .catch(error => {
                     console.error("Error loading GeoJSON:", error);
