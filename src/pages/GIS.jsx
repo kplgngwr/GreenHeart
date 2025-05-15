@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
 import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, } from '@react-google-maps/api';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 
 
@@ -33,13 +34,20 @@ export default function GIS() {
         "Corn": "#FFD700",   // Gold
         "Soybean": "#8FBC8F", // Dark sea green
         "Cotton": "#F0FFFF"   // Azure
-      };
+    };
     const [selectedCrop, setSelectedCrop] = useState('');
     const [polygonCrops, setPolygonCrops] = useState({});
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
 
-    // Keep existing useEffect for land data
+
+    const data = [
+        { stage: "Germination", value: 30 },
+        { stage: "Vegetative", value: 60 },
+        { stage: "Flowering", value: 90 },
+        { stage: "Maturity", value: 100 },
+    ];
+
 
     // Inside your GIS component, after your map is ready…
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -64,12 +72,12 @@ export default function GIS() {
                             feature.properties.id = index;
                         }
                     });
-                    
+
                     // Remove any existing data layers before adding new
                     mapRef.current.data.forEach(feature => {
                         mapRef.current.data.remove(feature);
                     });
-                    
+
                     setGeoJsonData(data);
                     console.log(data);
                     mapRef.current.data.addGeoJson(data);
@@ -81,14 +89,14 @@ export default function GIS() {
                         feature.forEachProperty((value, property) => {
                             properties[property] = value;
                         });
-                        
+
                         // Get ID from properties or use feature index
                         const polygonId = properties.id || feature.getId();
                         const cropType = polygonCrops[polygonId];
-                        
+
                         // Get color based on crop type
                         const cropColor = cropType ? cropColors[cropType] || '#4CAF50' : '#3388ff';
-                        
+
                         return {
                             fillColor: cropColor,
                             fillOpacity: selectedPolygon === polygonId ? 0.6 : 0.4,
@@ -97,23 +105,23 @@ export default function GIS() {
                             strokeOpacity: 1
                         };
                     });
-                    
+
 
                     // Add click event listener for polygons
                     mapRef.current.data.addListener('click', (event) => {
                         const feature = event.feature;
-                        
+
                         // Access properties correctly
                         const properties = {};
                         feature.forEachProperty((value, property) => {
                             properties[property] = value;
                         });
                         console.log("Properties:", properties);
-                        
+
                         // Get the ID directly from properties or use index
                         const polygonId = properties.id || feature.getId();
                         console.log("Selected polygon with ID:", polygonId);
-                        
+
                         setSelectedPolygon(polygonId);
                         mapRef.current.data.revertStyle();
                         mapRef.current.data.overrideStyle(feature, {
@@ -164,13 +172,13 @@ export default function GIS() {
 
 
     return (
-        <div className="flex h-screen bg-white text-white">
+        <div className="flex min-h-screen bg-white text-white">
             {/* Left + Center Panel */}
             <div className="flex flex-1 flex-col gap-4 p-4 overflow-hidden">
 
 
                 {/* Satellite + Tabs Container */}
-                <div className="flex flex-1 gap-4 overflow-hidden">
+                <div className="flex flex-1 gap-4 ">
                     {/* Left: Map + Tabs */}
                     <div className="flex flex-col  flex-1  rounded-lg overflow-hidden">
                         {/* Map (fixed height) */}
@@ -191,8 +199,48 @@ export default function GIS() {
 
                         </div>
 
+
+                        <div className="flex items-center justify-between p-1 px-2 bg-gray-900 text-white rounded-b-xl">
+                            <div className="flex justify-start ">
+                                <button className="bg-green-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
+                                    Show historical images
+                                </button>
+                            </div>
+
+                            <div className="flex space-x-3 overflow-x-auto ">
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    13 Jan'25
+                                </button>
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    23 Jan'25
+                                </button>
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    02 Feb'25
+                                </button>
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    12 Feb'25
+                                </button>
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    17 Feb'25
+                                </button>
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    04 Mar'25
+                                </button>
+                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                    09 Mar'25
+                                </button>
+                            </div>
+
+                            <div className="flex justify-end ">
+                                <button className="bg-green-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
+                                    Next image <span className="ml-2">May 18, 2025</span>
+                                </button>
+                            </div>
+                        </div>
+
+
                         {/* Tabs (scrollable) */}
-                        <div className="flex-1 overflow-y-auto p-4 mt-4 rounded-2xl bg-gray-800">
+                        <div className="flex flex-col  p-4 mt-4 rounded-2xl bg-gray-800 h-full">
                             {/* Tab Buttons */}
                             <div className="flex justify-between border-b border-gray-600 mb-4 w-full">
                                 {tabs.map((tab) => (
@@ -284,7 +332,7 @@ export default function GIS() {
                                     <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-4 space-y-3">
                                         <h3 className="font-semibold">Crop management guide</h3>
                                         <p className="text-gray-200 text-sm">
-                                            Explore EOSDA Crop Monitoring applications for different crops here
+                                            Explore the Crop Monitoring applications for different crops here
                                         </p>
                                         <a
                                             href="#"
@@ -324,14 +372,27 @@ export default function GIS() {
                                         <p className="text-blue-500 text-sm">
                                             Select a crop to view its growth stages
                                         </p>
+
+                                        {/* Recharts Visualization */}
+                                        <ResponsiveContainer width="100%" height={300}>
+                                            <BarChart data={data}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis dataKey="stage" />
+                                                <YAxis />
+                                                <Tooltip />
+                                                <Legend />
+                                                <Bar dataKey="value" fill="#4F91FC" />
+                                            </BarChart>
+                                        </ResponsiveContainer>
                                     </div>
                                 </div>
                             )}
 
                             {activeTab === "Activities" && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Left Section: Current Risks, NDVI Split */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {/* Current risks */}
+                                        {/* Current Risks */}
                                         <div className="bg-gray-700 rounded-lg p-4 space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <span>Current risks</span>
@@ -348,7 +409,7 @@ export default function GIS() {
                                             <p className="text-sm">
                                                 Risk information on this field{' '}
                                                 <a href="#" className="text-blue-500 hover:underline">
-                                                    is available in the Essentional or Professional plans
+                                                    is available in the Essential or Professional plans
                                                 </a>
                                             </p>
                                         </div>
@@ -369,7 +430,7 @@ export default function GIS() {
                                             </div>
                                             <p className="text-gray-400 text-sm">Date: 10 May’25</p>
 
-                                            {/* Dummy bar chart */}
+                                            {/* Dummy Bar Chart */}
                                             <div className="flex items-end space-x-2 h-24">
                                                 <div className="w-2 bg-green-400" style={{ height: '2%' }} />
                                                 <div className="w-2 bg-yellow-400" style={{ height: '13.72%' }} />
@@ -388,8 +449,68 @@ export default function GIS() {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Right Section: Crop Status, Weather, Field Data */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Crop Status */}
+                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span>Crop Status</span>
+                                                <svg
+                                                    className="w-4 h-4 text-gray-400"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                                                    <path d="M12 8v4" strokeWidth="2" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm">
+                                                The current status of the crop is <span className="text-green-400">Healthy</span>. Expected to reach maturity by <span className="text-yellow-400">30th June 2025</span>.
+                                            </p>
+                                        </div>
+
+                                        {/* Weather Information */}
+                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span>Weather Forecast</span>
+                                                <svg
+                                                    className="w-4 h-4 text-gray-400"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                                                    <path d="M12 8v4" strokeWidth="2" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm">Next weather forecast: <span className="text-blue-400">Rainy</span> for the next 48 hours.</p>
+                                            <p className="text-sm">Ideal conditions for crop growth: <span className="text-green-400">Moderate temperature & Moisture</span>.</p>
+                                        </div>
+
+                                        {/* Field Data */}
+                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span>Field Data Overview</span>
+                                                <svg
+                                                    className="w-4 h-4 text-gray-400"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                                                    <path d="M12 8v4" strokeWidth="2" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-sm">Total field area: <span className="text-green-400">1500 sq. meters</span></p>
+                                            <p className="text-sm">Irrigation status: <span className="text-yellow-400">Completed</span></p>
+                                            <p className="text-sm">Fertilization status: <span className="text-green-400">Ongoing</span></p>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
+
                         </div>
                     </div>
 
