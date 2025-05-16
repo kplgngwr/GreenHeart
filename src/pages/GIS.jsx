@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import axios from "axios";
 import Weather from "../Components/Weather";
 import ConnectStationsModal from "../Components/ConnectStationsModal";
+import Chatbot from "../Components/Chatbot";
 
 
 const containerStyle = {
@@ -40,6 +41,9 @@ export default function GIS() {
         "Soybean": "#8FBC8F", // Dark sea green
         "Cotton": "#F0FFFF"   // Azure
     };
+    const [chatOpen, setChatOpen] = useState(false);
+
+    const toggleChat = () => setChatOpen((open) => !open);
 
     const cropData = [
         {
@@ -883,7 +887,12 @@ export default function GIS() {
                         {/* Footer */}
                         <div className="space-y-2 mt-4 px-2 text-sm">
                             <div>✅ Insurance validation </div>
-                            <div>✨ AI assistant</div>
+                            <button
+                                onClick={toggleChat}
+                                className="px-4 py-2 bg-teal-600 text-white rounded-xl"
+                            >
+                                {chatOpen ? 'Close AI assistant' : 'Start AI assistant'}
+                            </button>
                             <div>🔔 Notifications</div>
 
                             {/* Help Center */}
@@ -921,6 +930,10 @@ export default function GIS() {
             <Weather
                 isOpen={isWeatherOpen}
                 onClose={() => setIsWeatherOpen(false)}
+            />
+            <Chatbot
+                isOpenExternal={chatOpen}
+                onOpenChange={setChatOpen}
             />
         </div>
     );
