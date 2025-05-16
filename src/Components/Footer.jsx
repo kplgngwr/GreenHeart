@@ -2,7 +2,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-green-700 to-green-600 text-white py-8 border-t border-gray-300 relative overflow-hidden">
+    <footer className="bg-gradient-to-r from-teal-700 to-teal-800 text-white py-8 border-t border-gray-300 relative overflow-hidden">
       <div className="container mx-auto flex flex-wrap justify-around items-start">
         {[
           { title: "MENU", links: ["Home", "Educational Resources", "Crop Vision"] },

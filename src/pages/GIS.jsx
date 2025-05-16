@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
-import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, DrawingManager, Polygon, } from '@react-google-maps/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import axios from "axios";
 import Weather from "../Components/Weather";
+import ConnectStationsModal from "../Components/ConnectStationsModal";
 
 
 const containerStyle = {
@@ -26,7 +27,9 @@ export default function GIS() {
     const [lands, setLands] = useState([]);
     const toggle = setter => setter(prev => !prev);
     const tabs = ['Crop info', 'Chart', 'Activities'];
+    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
+    const [modalOpen, setModalOpen] = useState(false);
     // Add new state variables for polygon selection and crop allocation
     const [selectedPolygon, setSelectedPolygon] = useState(null);
     const [cropOptions, setCropOptions] = useState(['Wheat', 'Rice', 'Corn', 'Soybean', 'Cotton']);
@@ -86,9 +89,6 @@ export default function GIS() {
     const [polygonCrops, setPolygonCrops] = useState({});
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
-
-
-
 
     // Inside your GIS component, after your map is ready…
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -244,6 +244,56 @@ export default function GIS() {
     const handleLocationChange = (e) => {
         setLocation(e.target.value);
     };
+    const [drawingMode, setDrawingMode] = useState(false);
+    const [drawingManager, setDrawingManager] = useState(null);
+    const [customPolygons, setCustomPolygons] = useState([]);
+    const onPolygonComplete = (polygon) => {
+        // Get polygon path
+        const path = polygon.getPath().getArray();
+        const polygonCoords = path.map(coord => ({
+            lat: coord.lat(),
+            lng: coord.lng()
+        }));
+
+        // Create a unique ID for the new polygon
+        const newPolygonId = `custom-${Date.now()}`;
+
+        // Add to custom polygons
+        setCustomPolygons(prev => [
+            ...prev,
+            { id: newPolygonId, path: polygonCoords }
+        ]);
+
+        // Make the new polygon selectable
+        polygon.addListener('click', () => {
+            setSelectedPolygon(newPolygonId);
+
+            // Apply selection styling
+            polygon.setOptions({
+                fillOpacity: 0.6,
+                strokeColor: '#FF4500',
+                strokeWeight: 2
+            });
+        });
+
+        // Set this as the selected polygon
+        setSelectedPolygon(newPolygonId);
+
+        // Turn off drawing mode after polygon is complete
+        setDrawingMode(false);
+        drawingManager.setDrawingMode(null);
+    };
+
+    // Function to toggle drawing mode
+    const toggleDrawingMode = () => {
+        if (drawingMode) {
+            setDrawingMode(false);
+            drawingManager.setDrawingMode(null);
+        } else {
+            setDrawingMode(true);
+            drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+        }
+    };
     return (
         <div className="flex min-h-screen bg-white text-white">
             {/* Left + Center Panel */}
@@ -254,7 +304,7 @@ export default function GIS() {
                     <div className="flex flex-col  flex-1  rounded-lg overflow-hidden">
                         {/* Map (fixed height) */}
                         <div className="h-[400px]">
-                            <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY}>
+                            <LoadScript libraries={['drawing']} googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY}>
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
                                     center={startingPoint}
@@ -262,14 +312,55 @@ export default function GIS() {
                                     onLoad={handleMapLoad}
                                     mapTypeId="hybrid"
                                 >
-                                    {/* Other map layers or markers */}
+                                    {mapLoaded && (
+                                        <DrawingManager
+                                            onLoad={(drawingManagerInstance) => {
+                                                setDrawingManager(drawingManagerInstance);
+                                            }}
+                                            onPolygonComplete={onPolygonComplete}
+                                            options={{
+                                                drawingControl: false,
+                                                polygonOptions: {
+                                                    fillColor: '#4CAF50',
+                                                    fillOpacity: 0.4,
+                                                    strokeColor: '#32CD32',
+                                                    strokeWeight: 1,
+                                                    clickable: true,
+                                                    editable: true,
+                                                    draggable: true,
+                                                },
+                                            }}
+                                        />
+                                    )}
+
+                                    {/* Render custom polygons */}
+                                    {customPolygons.map((polygon) => (
+                                        <Polygon
+                                            key={polygon.id}
+                                            paths={polygon.path}
+                                            options={{
+                                                fillColor: polygonCrops[polygon.id] ? cropColors[polygonCrops[polygon.id]] : '#4CAF50',
+                                                fillOpacity: selectedPolygon === polygon.id ? 0.6 : 0.4,
+                                                strokeColor: selectedPolygon === polygon.id ? '#FF4500' : '#32CD32',
+                                                strokeWeight: selectedPolygon === polygon.id ? 2 : 1,
+                                                clickable: true,
+                                            }}
+                                            onClick={() => setSelectedPolygon(polygon.id)}
+                                        />
+                                    ))}
                                 </GoogleMap>
                             </LoadScript>
 
 
 
                         </div>
-
+                        {/* Add this button somewhere in your UI */}
+                        <button
+                            onClick={toggleDrawingMode}
+                            className={`px-4 py-2 absolute right-[22rem] top-[26rem] rounded ${drawingMode ? 'bg-red-500' : 'bg-green-500'}`}
+                        >
+                            {drawingMode ? 'Cancel Drawing' : 'Draw Polygon'}
+                        </button>
 
                         <div className="flex items-center justify-between p-1 px-2 bg-teal-800 text-white rounded-b-xl">
                             <div className="flex justify-start ">
@@ -491,7 +582,7 @@ export default function GIS() {
                                             </span>
                                             <button className="text-blue-500 text-sm hover:underline">Edit</button>
                                         </div>
-                                        
+
 
                                         {/* Recharts Visualization */}
                                         <ResponsiveContainer width="100%" height={300}>
@@ -728,7 +819,10 @@ export default function GIS() {
                                         </div>
                                     )}
                                 </div>
-
+                                <div>
+                                    <button className="px-2" onClick={() => setModalOpen(true)}> ⚛️ Open Connect Modal</button>
+                                    <ConnectStationsModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+                                </div>
                                 {/* Weather */}
                                 <div>
                                     <div
@@ -780,17 +874,17 @@ export default function GIS() {
                                     )}
                                 </div>
 
-                                
 
-                                
+
+
                             </div>
                         </div>
 
                         {/* Footer */}
                         <div className="space-y-2 mt-4 px-2 text-sm">
-                        <div>✅ Insurance validation </div>
-                        <div>✨ AI assistant</div>
-                        <div>🔔 Notifications</div>
+                            <div>✅ Insurance validation </div>
+                            <div>✨ AI assistant</div>
+                            <div>🔔 Notifications</div>
 
                             {/* Help Center */}
                             <div>

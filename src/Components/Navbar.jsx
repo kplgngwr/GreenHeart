@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { FaShoppingCart, FaBell, FaUserCircle, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '/logo1.png';
 import { useFirebase } from '../context/firebase';
+import Chatbot from './Chatbot';
 
 function Navbar() {
   const { isLoggedIn, signOut, getUserDetails } = useFirebase();
@@ -123,6 +124,7 @@ function Navbar() {
           </div>
         </div> */}
       </nav>
+      <Chatbot />
 
 
     </header>
