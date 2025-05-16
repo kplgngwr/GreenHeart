@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@react-google-maps/api": "^2.20.6",
     "@tailwindcss/vite": "^4.0.9",
     "axios": "^1.9.0",
