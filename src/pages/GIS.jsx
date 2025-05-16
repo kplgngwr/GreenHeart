@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
 import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, } from '@react-google-maps/api';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import axios from "axios";
+import Weather from "../Components/Weather";
 
 
 const containerStyle = {
@@ -10,6 +11,7 @@ const containerStyle = {
     height: '400px',
 };
 const startingPoint = { lat: 30.762357, lng: 76.598619 };
+
 
 
 export default function GIS() {
@@ -35,18 +37,57 @@ export default function GIS() {
         "Soybean": "#8FBC8F", // Dark sea green
         "Cotton": "#F0FFFF"   // Azure
     };
+
+    const cropData = [
+        {
+            name: 'Wheat',
+            area: 4000,
+            growthStage: 'Vegetative',
+            yield: 2400,
+        },
+        {
+            name: 'Rice',
+            area: 3000,
+            growthStage: 'Flowering',
+            yield: 2210,
+        },
+        {
+            name: 'Maize',
+            area: 2000,
+            growthStage: 'Mature',
+            yield: 2290,
+        },
+        {
+            name: 'Soybean',
+            area: 2780,
+            growthStage: 'Early vegetative',
+            yield: 2000,
+        },
+        {
+            name: 'Cotton',
+            area: 1890,
+            growthStage: 'Flowering',
+            yield: 2181,
+        },
+        {
+            name: 'Sugarcane',
+            area: 2390,
+            growthStage: 'Ripening',
+            yield: 2500,
+        },
+        {
+            name: 'Barley',
+            area: 3490,
+            growthStage: 'Heading',
+            yield: 2100,
+        },
+    ];
     const [selectedCrop, setSelectedCrop] = useState('');
     const [polygonCrops, setPolygonCrops] = useState({});
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
 
 
-    const data = [
-        { stage: "Germination", value: 30 },
-        { stage: "Vegetative", value: 60 },
-        { stage: "Flowering", value: 90 },
-        { stage: "Maturity", value: 100 },
-    ];
 
 
     // Inside your GIS component, after your map is ready…
@@ -170,13 +211,43 @@ export default function GIS() {
         }
     };
 
+    const [weatherData, setWeatherData] = useState(null);
+    const [location, setLocation] = useState('Chandigarh'); // Default location
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [isWeatherOpen, setIsWeatherOpen] = useState(false);
+    const apiKey = 'dd3c83dcbff8dcb138dd19aac8a3a6ff'; // Replace with your API key
+    const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
+    useEffect(() => {
+        fetchWeatherData();
+    }, [location]);
+
+    const fetchWeatherData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await axios.get(apiUrl, {
+                params: {
+                    q: location,
+                    appid: apiKey,
+                    units: 'metric', // Change to 'imperial' for Fahrenheit
+                },
+            });
+            setWeatherData(response.data);
+        } catch (err) {
+            setError('Failed to fetch weather data');
+        }
+        setLoading(false);
+    };
+
+    const handleLocationChange = (e) => {
+        setLocation(e.target.value);
+    };
     return (
         <div className="flex min-h-screen bg-white text-white">
             {/* Left + Center Panel */}
             <div className="flex flex-1 flex-col gap-4 p-4 overflow-hidden">
-
-
                 {/* Satellite + Tabs Container */}
                 <div className="flex flex-1 gap-4 ">
                     {/* Left: Map + Tabs */}
@@ -200,39 +271,39 @@ export default function GIS() {
                         </div>
 
 
-                        <div className="flex items-center justify-between p-1 px-2 bg-gray-900 text-white rounded-b-xl">
+                        <div className="flex items-center justify-between p-1 px-2 bg-teal-800 text-white rounded-b-xl">
                             <div className="flex justify-start ">
-                                <button className="bg-green-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
+                                <button className="bg-teal-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
                                     Show historical images
                                 </button>
                             </div>
 
                             <div className="flex space-x-3 overflow-x-auto ">
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     13 Jan'25
                                 </button>
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     23 Jan'25
                                 </button>
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     02 Feb'25
                                 </button>
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     12 Feb'25
                                 </button>
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     17 Feb'25
                                 </button>
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     04 Mar'25
                                 </button>
-                                <button className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
+                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
                                     09 Mar'25
                                 </button>
                             </div>
 
                             <div className="flex justify-end ">
-                                <button className="bg-green-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
+                                <button className="bg-teal-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
                                     Next image <span className="ml-2">May 18, 2025</span>
                                 </button>
                             </div>
@@ -240,15 +311,15 @@ export default function GIS() {
 
 
                         {/* Tabs (scrollable) */}
-                        <div className="flex flex-col  p-4 mt-4 rounded-2xl bg-gray-800 h-full">
+                        <div className="flex flex-col  p-4 mt-4 rounded-2xl bg-teal-800 h-full">
                             {/* Tab Buttons */}
-                            <div className="flex justify-between border-b border-gray-600 mb-4 w-full">
+                            <div className="flex justify-between border-b border-teal-700 mb-4 w-full">
                                 {tabs.map((tab) => (
                                     <button
                                         key={tab}
                                         onClick={() => setActiveTab(tab)}
                                         className={`px-4 py-2 w-full -mb-px ${activeTab === tab
-                                            ? "border-b-2 border-blue-500 text-blue-500"
+                                            ? "border-b-2 border-black text-black"
                                             : "text-gray-400 hover:text-white"
                                             }`}
                                     >
@@ -261,7 +332,7 @@ export default function GIS() {
                             {activeTab === "Crop info" && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {/* Card: Crop Rotation */}
-                                    <div className=" bg-gray-700 p-4 rounded-lg">
+                                    <div className=" bg-teal-700 p-4 rounded-lg">
                                         <h3 className="text-xl font-semibold mb-2">Polygon Selection</h3>
                                         {selectedPolygon ? (
                                             <p>Selected Polygon ID: {selectedPolygon}</p>
@@ -270,50 +341,109 @@ export default function GIS() {
                                         )}
 
                                         {selectedPolygon && (
-                                            <div className="mt-4">
-                                                <p>Current Crop: {polygonCrops[selectedPolygon] || 'None'}</p>
+                                            <div className="mt-4 bg-teal-700 p-4 rounded-lg">
+                                                <h2 className="text-xl text-white mb-4">Polygon Selection</h2>
 
-                                                <div className="mt-4">
-                                                    <label className="block mb-2">Allocate Crop:</label>
-                                                    <select
-                                                        value={selectedCrop}
-                                                        onChange={(e) => setSelectedCrop(e.target.value)}
-                                                        className="bg-gray-800 text-white p-2 rounded w-full mb-2"
-                                                    >
-                                                        <option value="">Select a crop</option>
-                                                        {cropOptions.map(crop => (
-                                                            <option key={crop} value={crop}>{crop}</option>
-                                                        ))}
-                                                    </select>
+                                                {/* Landmark Name */}
+                                                <div className="mb-4">
+                                                    <label className="block text-sm text-gray-400">Landmark Name</label>
+                                                    <input
+                                                        type="text"
+                                                        value="East Wellside Plot"  // This value should be dynamic based on your state or props
+                                                        className="bg-teal-700 text-white p-2 rounded w-full"
+                                                        disabled
+                                                    />
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    {/* Survey/Khasra No. */}
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm text-gray-400">Survey/Khasra No.</label>
+                                                        <input
+                                                            type="text"
+                                                            value="105/7"  // This value should be dynamic
+                                                            className="bg-gray-700 text-white p-2 rounded w-full"
+                                                            disabled
+                                                        />
+                                                    </div>
 
-                                                    <div className="flex gap-2 mt-2">
-                                                        <button
-                                                            onClick={allocateCrop}
-                                                            disabled={!selectedCrop}
-                                                            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded disabled:opacity-50"
-                                                        >
-                                                            Allocate Crop
-                                                        </button>
-
-                                                        <button
-                                                            onClick={deallocateCrop}
-                                                            disabled={!polygonCrops[selectedPolygon]}
-                                                            className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded disabled:opacity-50"
-                                                        >
-                                                            Deallocate Crop
-                                                        </button>
+                                                    {/* Polygon ID */}
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm text-gray-400">Polygon ID</label>
+                                                        <input
+                                                            type="text"
+                                                            value="92"  // This value should be dynamic
+                                                            className="bg-gray-700 text-white p-2 rounded w-full"
+                                                            disabled
+                                                        />
                                                     </div>
                                                 </div>
+                                                <div className="flex gap-2">
+                                                    {/* Current Crop */}
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm text-gray-400">Current Crop</label>
+                                                        <select
+                                                            value={selectedCrop}
+                                                            onChange={(e) => setSelectedCrop(e.target.value)}
+                                                            className="bg-gray-800 text-white p-2 rounded w-full mb-2"
+                                                        >
+                                                            <option value="">Select a crop</option>
+                                                            {cropOptions.map(crop => (
+                                                                <option key={crop} value={crop}>{crop}</option>
+                                                            ))}
+                                                        </select>
+
+                                                    </div>
+                                                    {/* Irrigation */}
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm text-gray-400">Irrigation</label>
+                                                        <input
+                                                            type="text"
+                                                            value="Canal"  // This value should be dynamic
+                                                            className="bg-gray-700 text-white p-2 rounded w-full"
+                                                            disabled
+                                                        />
+                                                    </div>
+                                                </div>
+                                                {/* Growth Stage */}
+                                                <div className="mb-4">
+                                                    <label className="block text-sm text-gray-400">Growth Stage</label>
+                                                    <input
+                                                        type="text"
+                                                        value="Vegetative (NDVI: 0.65)"  // This value should be dynamic
+                                                        className="bg-gray-700 text-white p-2 rounded w-full"
+                                                        disabled
+                                                    />
+                                                </div>
+
+
+                                                {/* Buttons Section */}
+                                                <div className="flex gap-4 mt-4">
+                                                    <button
+                                                        onClick={allocateCrop}
+                                                        disabled={!selectedCrop}
+                                                        className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
+                                                    >
+                                                        Allocate Crop
+                                                    </button>
+                                                    <button
+                                                        onClick={deallocateCrop}
+                                                        disabled={!polygonCrops[selectedPolygon]}
+                                                        className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
+                                                    >
+                                                        Deallocate Crop
+                                                    </button>
+                                                </div>
                                             </div>
+
                                         )}
                                     </div>
 
                                     {/* Card: Sown Area */}
-                                    <div className="bg-gray-700 rounded-lg  space-y-2">
-                                        <div className="flex justify-between items-center bg-gray-600 text-white px-4 py-2 rounded-t-lg">
+                                    <div className="bg-teal-700 rounded-lg  space-y-2">
+                                        <div className="flex justify-between items-center bg-teal-600 text-white px-4 py-2 rounded-t-lg">
                                             <span className="" >Sown area detected</span>
                                             <svg
-                                                className="w-4 h-4 text-gray-400"
+                                                className="w-4 h-4 text-black"
                                                 fill="none"
                                                 stroke="currentColor"
                                                 viewBox="0 0 24 24"
@@ -322,14 +452,14 @@ export default function GIS() {
                                                 <path d="M12 8v4l2 2" strokeWidth="2" />
                                             </svg>
                                         </div>
-                                        <div className="flex p-4 justify-between items-center">
-                                            <p className="text-gray-400 text-sm">10 May’25</p>
-                                            <p className="text-gray-400 text-sm">Not sown</p>
+                                        <div className="flex py-1 p-4 justify-between items-center">
+                                            <p className="text-black text-sm">10 May’25</p>
+                                            <p className="text-black text-sm">Not sown</p>
                                         </div>
                                     </div>
 
                                     {/* Card: Crop Management Guide */}
-                                    <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-lg p-4 space-y-3">
+                                    <div className="bg-teal-700 rounded-lg p-4 space-y-3">
                                         <h3 className="font-semibold">Crop management guide</h3>
                                         <p className="text-gray-200 text-sm">
                                             Explore the Crop Monitoring applications for different crops here
@@ -353,36 +483,52 @@ export default function GIS() {
                             )}
 
                             {activeTab === "Chart" && (
-                                <div className="bg-gray-700 rounded-lg p-4">
-                                    <div className="bg-gray-700 rounded-lg p-4 space-y-4">
+                                <div className="bg-teal-700 rounded-lg p-4">
+                                    <div className="bg-teal-700 rounded-lg p-4 space-y-4">
                                         <div className="flex justify-between items-center">
                                             <span className="flex items-center space-x-1">
-                                                <svg
-                                                    className="w-5 h-5 text-green-400"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path d="M3 12l2-2 4 4 8-8 4 4" strokeWidth="2" />
-                                                </svg>
                                                 <span>Growth Stages</span>
                                             </span>
                                             <button className="text-blue-500 text-sm hover:underline">Edit</button>
                                         </div>
-                                        <p className="text-blue-500 text-sm">
-                                            Select a crop to view its growth stages
-                                        </p>
+                                        
 
                                         {/* Recharts Visualization */}
                                         <ResponsiveContainer width="100%" height={300}>
-                                            <BarChart data={data}>
-                                                <CartesianGrid strokeDasharray="3 3" />
-                                                <XAxis dataKey="stage" />
-                                                <YAxis />
+                                            <AreaChart
+                                                data={cropData}
+                                                margin={{
+                                                    top: 10,
+                                                    right: 30,
+                                                    left: 0,
+                                                    bottom: 0,
+                                                }}
+                                            >
+                                                <CartesianGrid stroke="#0c0a09" strokeDasharray="3 3" />
+                                                <XAxis dataKey="name" stroke="#0c0a09" />
+                                                <YAxis stroke="#0c0a09" />
                                                 <Tooltip />
-                                                <Legend />
-                                                <Bar dataKey="value" fill="#4F91FC" />
-                                            </BarChart>
+
+                                                {/* Area representing Crop Area */}
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="area"
+                                                    stackId="1"
+                                                    stroke="#8884d8"
+                                                    fill="#8884d8"
+                                                    name="Area (sq m)"
+                                                />
+
+                                                {/* Area representing Crop Yield */}
+                                                <Area
+                                                    type="monotone"
+                                                    dataKey="yield"
+                                                    stackId="1"
+                                                    stroke="#82ca9d"
+                                                    fill="#82ca9d"
+                                                    name="Yield (kg)"
+                                                />
+                                            </AreaChart>
                                         </ResponsiveContainer>
                                     </div>
                                 </div>
@@ -393,7 +539,7 @@ export default function GIS() {
                                     {/* Left Section: Current Risks, NDVI Split */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {/* Current Risks */}
-                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                        <div className="bg-teal-700 rounded-lg p-4 space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <span>Current risks</span>
                                                 <svg
@@ -415,7 +561,7 @@ export default function GIS() {
                                         </div>
 
                                         {/* NDVI values split */}
-                                        <div className="bg-gray-700 rounded-lg p-4 space-y-3">
+                                        <div className="bg-teal-700 rounded-lg p-4 space-y-3">
                                             <div className="flex justify-between items-center">
                                                 <span>NDVI values split</span>
                                                 <svg
@@ -453,7 +599,7 @@ export default function GIS() {
                                     {/* Right Section: Crop Status, Weather, Field Data */}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         {/* Crop Status */}
-                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                        <div className="bg-teal-700 rounded-lg p-4 space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <span>Crop Status</span>
                                                 <svg
@@ -472,9 +618,9 @@ export default function GIS() {
                                         </div>
 
                                         {/* Weather Information */}
-                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                        <div className="bg-teal-700 rounded-lg p-4 space-y-2">
                                             <div className="flex justify-between items-center">
-                                                <span>Weather Forecast</span>
+                                                <span className="text-white font-semibold text-lg">Weather Forecast</span>
                                                 <svg
                                                     className="w-4 h-4 text-gray-400"
                                                     fill="none"
@@ -485,12 +631,48 @@ export default function GIS() {
                                                     <path d="M12 8v4" strokeWidth="2" />
                                                 </svg>
                                             </div>
-                                            <p className="text-sm">Next weather forecast: <span className="text-blue-400">Rainy</span> for the next 48 hours.</p>
-                                            <p className="text-sm">Ideal conditions for crop growth: <span className="text-green-400">Moderate temperature & Moisture</span>.</p>
+
+                                            {loading ? (
+                                                <p className="text-gray-400 text-sm">Loading weather data...</p>
+                                            ) : weatherData ? (
+                                                <div>
+                                                    <p className="text-sm">
+                                                        Next weather forecast:{" "}
+                                                        <span className="text-blue-400">
+                                                            {weatherData.weather[0].description}
+                                                        </span>{" "}
+                                                        for the next 48 hours.
+                                                    </p>
+                                                    <p className="text-sm">
+                                                        Ideal conditions for crop growth:{" "}
+                                                        <span className="text-green-400">
+                                                            {weatherData.main.temp > 20 ? "Moderate temperature &" : "Low temperature &"} Moisture
+                                                        </span>
+                                                        .
+                                                    </p>
+                                                    <div className="mt-4">
+                                                        <input
+                                                            type="text"
+                                                            value={location}
+                                                            onChange={handleLocationChange}
+                                                            placeholder="Enter city name"
+                                                            className="p-2 rounded bg-teal-800 text-white w-full mb-2"
+                                                        />
+                                                        <button
+                                                            onClick={fetchWeatherData}
+                                                            className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                        >
+                                                            Get Weather for {location}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-red-500 text-sm">Failed to fetch weather data</p>
+                                            )}
                                         </div>
 
                                         {/* Field Data */}
-                                        <div className="bg-gray-700 rounded-lg p-4 space-y-2">
+                                        <div className="bg-teal-700 rounded-lg p-4 space-y-2">
                                             <div className="flex justify-between items-center">
                                                 <span>Field Data Overview</span>
                                                 <svg
@@ -515,20 +697,19 @@ export default function GIS() {
                     </div>
 
                     {/* Right Sidebar */}
-                    <div className="w-64 bg-[#141c27] text-gray-300 flex flex-col justify-between py-4 px-2 overflow-auto">
+                    <div className="w-64 bg-teal-800 rounded-xl text-gray-300 flex flex-col justify-between py-4 px-2 overflow-auto">
                         <div>
                             {/* Logo + Title */}
-                            <div className="text-white font-bold text-lg mb-4 px-2">🌿 CROP <span className="text-sm font-light">monitoring</span></div>
+                            <div className="text-white font-bold text-lg mb-4 px-2">🌿 GreenHeart <span className="text-sm font-light">monitoring</span></div>
 
                             {/* Season Box */}
-                            <div className="bg-[#202b3a] p-3 rounded-md mb-4 text-sm font-semibold text-white">
+                            <div className="bg-teal-700 p-3 rounded-md mb-4 text-sm font-semibold text-white">
                                 📅 Season 2025
                             </div>
 
                             {/* Menu List */}
                             <div className="space-y-2 text-sm">
 
-                                <div className="px-2">🚀 Get started</div>
 
                                 {/* Monitoring Toggle */}
                                 <div>
@@ -552,74 +733,64 @@ export default function GIS() {
                                 <div>
                                     <div
                                         className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
-                                        onClick={() => toggle(setWeatherOpen)}
+                                        onClick={() => setIsWeatherOpen(true)}
                                     >
                                         ☁️ Weather
-                                        <span>{weatherOpen ? '▾' : '▸'}</span>
+                                        <span>{weatherOpen ? "▾" : "▸"}</span>
                                     </div>
-                                    {weatherOpen && <div className="ml-6 mt-1">Coming soon...</div>}
+
+                                    {weatherOpen && (
+                                        <div className="ml-6 mt-2 bg-gray-700 rounded-lg p-4 space-y-2">
+                                            {loading ? (
+                                                <p className="text-gray-400 text-sm">Loading weather data...</p>
+                                            ) : weatherData ? (
+                                                <div>
+                                                    <p className="text-sm">
+                                                        Current weather:{" "}
+                                                        <span className="text-blue-400">{weatherData.weather[0].description}</span>
+                                                    </p>
+                                                    <p className="text-sm">
+                                                        Temperature:{" "}
+                                                        <span className="text-green-400">{weatherData.main.temp}°C</span>
+                                                    </p>
+                                                    <p className="text-sm">
+                                                        Humidity:{" "}
+                                                        <span className="text-green-400">{weatherData.main.humidity}%</span>
+                                                    </p>
+                                                    {/* <div className="mt-4">
+                                                        <input
+                                                            type="text"
+                                                            value={location}
+                                                            onChange={handleLocationChange}
+                                                            placeholder="Enter city name"
+                                                            className="p-2 rounded bg-gray-800 text-white w-full mb-2"
+                                                        />
+                                                        <button
+                                                            onClick={() => setWeatherOpen(true)}
+                                                            className="w-full py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                        >
+                                                            Get Weather for {location}
+                                                        </button>
+                                                    </div> */}
+                                                </div>
+                                            ) : (
+                                                <p className="text-red-500 text-sm">Failed to fetch weather data</p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
-                                {/* Scout Tasks */}
-                                <div className="px-2">📍 Scout tasks</div>
+                                
 
-                                {/* Overview */}
-                                <div>
-                                    <div
-                                        className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
-                                        onClick={() => toggle(setOverviewOpen)}
-                                    >
-                                        📊 Overview
-                                        <span>{overviewOpen ? '▾' : '▸'}</span>
-                                    </div>
-                                    {overviewOpen && <div className="ml-6 mt-1">Coming soon...</div>}
-                                </div>
-
-                                {/* VRA Maps */}
-                                <div>
-                                    <div
-                                        className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
-                                        onClick={() => toggle(setVraOpen)}
-                                    >
-                                        🗺 VRA maps
-                                        <span>{vraOpen ? '▾' : '▸'}</span>
-                                    </div>
-                                    {vraOpen && <div className="ml-6 mt-1">Coming soon...</div>}
-                                </div>
-
-                                {/* Field Activity Log */}
-                                <div className="px-2">🗓 Field activity log</div>
-
-                                {/* Data Manager */}
-                                <div>
-                                    <div
-                                        className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
-                                        onClick={() => toggle(setDataManagerOpen)}
-                                    >
-                                        💽 Data manager
-                                        <span>{dataManagerOpen ? '▾' : '▸'}</span>
-                                    </div>
-                                    {dataManagerOpen && <div className="ml-6 mt-1">Coming soon...</div>}
-                                </div>
-
-                                {/* Field Manager */}
-                                <div>
-                                    <div
-                                        className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
-                                        onClick={() => toggle(setFieldManagerOpen)}
-                                    >
-                                        🧱 Field manager
-                                        <span>{fieldManagerOpen ? '▾' : '▸'}</span>
-                                    </div>
-                                    {fieldManagerOpen && <div className="ml-6 mt-1">Coming soon...</div>}
-                                </div>
+                                
                             </div>
                         </div>
 
                         {/* Footer */}
                         <div className="space-y-2 mt-4 px-2 text-sm">
-                            <div>✨ AI assistant</div>
-                            <div>🔔 Notifications</div>
+                        <div>✅ Insurance validation </div>
+                        <div>✨ AI assistant</div>
+                        <div>🔔 Notifications</div>
 
                             {/* Help Center */}
                             <div>
@@ -631,18 +802,6 @@ export default function GIS() {
                                     <span>{helpOpen ? '▾' : '▸'}</span>
                                 </div>
                                 {helpOpen && <div className="ml-6 mt-1">Coming soon...</div>}
-                            </div>
-
-                            {/* Marketplace */}
-                            <div>
-                                <div
-                                    className="cursor-pointer hover:text-blue-400 flex justify-between items-center"
-                                    onClick={() => toggle(setMarketplaceOpen)}
-                                >
-                                    🛍 Marketplace
-                                    <span>{marketplaceOpen ? '▾' : '▸'}</span>
-                                </div>
-                                {marketplaceOpen && <div className="ml-6 mt-1">Coming soon...</div>}
                             </div>
 
                             {/* User Section */}
@@ -663,7 +822,12 @@ export default function GIS() {
                         </div>
                     </div>
                 </div>
+                <Weather />
             </div>
+            <Weather
+                isOpen={isWeatherOpen}
+                onClose={() => setIsWeatherOpen(false)}
+            />
         </div>
     );
 }
