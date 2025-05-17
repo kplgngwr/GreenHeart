@@ -9,6 +9,7 @@ import Chatbot from "../Components/Chatbot";
 import PolygonDronePanel from "../Components/PolygonDronePanel";
 import InsuranceValidationModal from "../Components/InsuranceValidationModal";
 import toast, { Toaster } from "react-hot-toast";
+import ReportModal from "../Components/ReportModal";
 
 
 const containerStyle = {
@@ -47,7 +48,7 @@ export default function GIS() {
     const [chatOpen, setChatOpen] = useState(false);
     const [sentinelOpen, setSentinelOpen] = useState(false);
     const [ndviOpen, setNdviOpen] = useState(false);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const toggleSentinel = () => setSentinelOpen((prev) => !prev);
     const toggleNdvi = () => setNdviOpen((prev) => !prev);
 
@@ -346,7 +347,7 @@ export default function GIS() {
                                             onLoad={(drawingManagerInstance) => {
                                                 setDrawingManager(drawingManagerInstance);
                                             }}
-                                            onPolygonComplete={onPolygonComplete}                                            options={{
+                                            onPolygonComplete={onPolygonComplete} options={{
                                                 drawingControl: false,
                                                 polygonOptions: {
                                                     fillColor: '#4CAF50',
@@ -400,17 +401,17 @@ export default function GIS() {
 
                                         return (
                                             <React.Fragment key={polygon.id}>                                                <Polygon
-                                                    paths={polygon.path}
-                                                    options={{
-                                                        fillColor: '#4CAF50',
-                                                        fillOpacity: 0, // Make fill transparent
-                                                        strokeColor: '#32CD32',
-                                                        strokeWeight: 0, // Hide the border
-                                                        strokeOpacity: 0, // Make stroke transparent
-                                                        clickable: true,
-                                                    }}
-                                                    onClick={() => setSelectedPolygon(polygon.id)}
-                                                />
+                                                paths={polygon.path}
+                                                options={{
+                                                    fillColor: '#4CAF50',
+                                                    fillOpacity: 0, // Make fill transparent
+                                                    strokeColor: '#32CD32',
+                                                    strokeWeight: 0, // Hide the border
+                                                    strokeOpacity: 0, // Make stroke transparent
+                                                    clickable: true,
+                                                }}
+                                                onClick={() => setSelectedPolygon(polygon.id)}
+                                            />
                                                 <GroundOverlay url={ndwiUrl} bounds={adjustedBounds} options={{ opacity: 0.6 }} />
                                             </React.Fragment>
                                         );
@@ -623,7 +624,12 @@ export default function GIS() {
                                                     />
                                                 </div>
 
-
+                                                <button
+                                                    className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
+                                                    onClick={() => setIsModalOpen(true)}
+                                                >
+                                                    Generate Report
+                                                </button>
                                                 {/* Buttons Section */}
                                                 <div className="flex gap-4 mt-4">
                                                     <button
@@ -1059,11 +1065,16 @@ export default function GIS() {
                 isOpenExternal={chatOpen}
                 onOpenChange={setChatOpen}
             />
-            <InsuranceValidationModal 
-  isOpen={modalOpenValidation}
-  onClose={() => setModalOpenValidation(false)}
-  onValidate={handleValidate}
-/>
+            <InsuranceValidationModal
+                isOpen={modalOpenValidation}
+                onClose={() => setModalOpenValidation(false)}
+                onValidate={handleValidate}
+            />
+            <ReportModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                previousCrop="Rice"
+            />
         </div>
     );
 }
