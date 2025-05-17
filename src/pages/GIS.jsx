@@ -6,6 +6,9 @@ import axios from "axios";
 import Weather from "../Components/Weather";
 import ConnectStationsModal from "../Components/ConnectStationsModal";
 import Chatbot from "../Components/Chatbot";
+import PolygonDronePanel from "../Components/PolygonDronePanel";
+import InsuranceValidationModal from "../Components/InsuranceValidationModal";
+import toast, { Toaster } from "react-hot-toast";
 
 
 const containerStyle = {
@@ -27,7 +30,7 @@ export default function GIS() {
     const [marketplaceOpen, setMarketplaceOpen] = useState(false);
     const [lands, setLands] = useState([]);
     const toggle = setter => setter(prev => !prev);
-    const tabs = ['Crop info', 'Chart', 'Activities'];
+    const tabs = ['Crop info', 'Chart', 'Activities', 'Drone Allocation'];
     const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -96,6 +99,7 @@ export default function GIS() {
     ];
     const [selectedCrop, setSelectedCrop] = useState('');
     const [polygonCrops, setPolygonCrops] = useState({});
+    const [modalOpenValidation, setModalOpenValidation] = useState(false);
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
 
@@ -310,8 +314,17 @@ export default function GIS() {
             drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
         }
     };
+
+
+    const handleValidate = (formData) => {
+        toast.success('Insurance validated report will be sent on mail');
+        console.log('Validating with', formData);
+        // ... call your API, show success, etc.
+        setModalOpenValidation(false);
+    };
     return (
         <div className="flex min-h-screen bg-white text-white">
+            <Toaster />
             {/* Left + Center Panel */}
             <div className="flex flex-1 flex-col gap-4 p-4 overflow-hidden">
                 {/* Satellite + Tabs Container */}
@@ -888,6 +901,10 @@ export default function GIS() {
                                 </div>
                             )}
 
+                            {activeTab === 'Drone Allocation' && (
+                                <PolygonDronePanel />
+                            )}
+
                         </div>
                     </div>
 
@@ -986,7 +1003,14 @@ export default function GIS() {
 
                         {/* Footer */}
                         <div className="space-y-2 mt-4 px-2 text-sm">
-                            <div>✅ Insurance validation </div>
+                            <button
+                                onClick={() => setModalOpenValidation(true)}
+                                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl"
+                            >
+                                ✅ Insurance validation
+                            </button>
+
+
                             <button
                                 onClick={toggleChat}
                                 className="px-4 py-2 bg-teal-600 text-white rounded-xl"
@@ -1035,6 +1059,11 @@ export default function GIS() {
                 isOpenExternal={chatOpen}
                 onOpenChange={setChatOpen}
             />
+            <InsuranceValidationModal 
+  isOpen={modalOpenValidation}
+  onClose={() => setModalOpenValidation(false)}
+  onValidate={handleValidate}
+/>
         </div>
     );
 }
