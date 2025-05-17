@@ -30,17 +30,24 @@ function Aboutus() {
       </section>
 
       <div className="text-center mt-10 py-10 p-5 bg-gray-50 rounded-lg shadow-lg transition-transform duration-300 hover:translate-y-[-5px] hover:shadow-xl">
-        <h2 className=" text-5xl font-bold text-green-700 mb-10">Meet Our Team</h2>
+        <h2 className=" text-5xl font-bold text-green-700 mb-10">Meet Our Team : Techno Tuners </h2>
         <div className="flex flex-col md:flex-row justify-center gap-10">
           <div className="text-center animate-fadeIn">
-            <img src={team1Image} alt="Garvit Saluja" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Garvit Saluja</h3>
-            <p className="text-gray-600 font-bold">CEO</p>
+            <img src="https://i.postimg.cc/MHPR61RZ/image.png" alt="Garvit Saluja" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
+            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Ashit Rai</h3>
           </div>
           <div className="text-center animate-fadeIn">
             <img src={team2Image} alt="Kapil Gangwar" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
             <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Kapil Gangwar</h3>
-            <p className="text-gray-600 font-bold">COO</p>
+          </div>
+          <div className="text-center animate-fadeIn">
+            <img src="https://i.postimg.cc/KYJWyHzd/image.png" alt="Alok Kumar Yadav" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
+            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Alok Kumar Yadav</h3>
+          </div>
+          
+          <div className="text-center animate-fadeIn">
+            <img src="https://i.postimg.cc/cCHhBxBH/image.png" alt="Kapil Gangwar" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
+            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Bhumi Kapoor</h3>
           </div>
         </div>
       </div>

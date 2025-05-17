@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
-import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, DrawingManager, Polygon, } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, DrawingManager, Polygon, GroundOverlay, } from '@react-google-maps/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import axios from "axios";
 import Weather from "../Components/Weather";
@@ -42,9 +42,14 @@ export default function GIS() {
         "Cotton": "#F0FFFF"   // Azure
     };
     const [chatOpen, setChatOpen] = useState(false);
+    const [sentinelOpen, setSentinelOpen] = useState(false);
+    const [ndviOpen, setNdviOpen] = useState(false);
+
+    const toggleSentinel = () => setSentinelOpen((prev) => !prev);
+    const toggleNdvi = () => setNdviOpen((prev) => !prev);
 
     const toggleChat = () => setChatOpen((open) => !open);
-
+    const NDWI = `https://ndvi-api-212349273966.us-central1.run.app/ndvi?bbox=${startingPoint.lng},${startingPoint.lat},${startingPoint.lng},${startingPoint.lat}&start_date=2023-02-01&end_date=2023-02-10`;
     const cropData = [
         {
             name: 'Wheat',
@@ -287,7 +292,14 @@ export default function GIS() {
         setDrawingMode(false);
         drawingManager.setDrawingMode(null);
     };
-
+    // Compute bounds from polygon path
+    const getPolygonBounds = (path) => {
+        const bounds = new window.google.maps.LatLngBounds();
+        path.forEach((point) => {
+            bounds.extend(point);
+        });
+        return bounds;
+    };
     // Function to toggle drawing mode
     const toggleDrawingMode = () => {
         if (drawingMode) {
@@ -337,21 +349,60 @@ export default function GIS() {
                                         />
                                     )}
 
-                                    {/* Render custom polygons */}
-                                    {customPolygons.map((polygon) => (
-                                        <Polygon
-                                            key={polygon.id}
-                                            paths={polygon.path}
-                                            options={{
-                                                fillColor: polygonCrops[polygon.id] ? cropColors[polygonCrops[polygon.id]] : '#4CAF50',
-                                                fillOpacity: selectedPolygon === polygon.id ? 0.6 : 0.4,
-                                                strokeColor: selectedPolygon === polygon.id ? '#FF4500' : '#32CD32',
-                                                strokeWeight: selectedPolygon === polygon.id ? 2 : 1,
-                                                clickable: true,
-                                            }}
-                                            onClick={() => setSelectedPolygon(polygon.id)}
-                                        />
-                                    ))}
+                                    {customPolygons.map((polygon) => {
+                                        const bounds = getPolygonBounds(polygon.path);
+
+                                        // Extract bounds coordinates
+                                        let swLng = bounds.getSouthWest().lng();
+                                        let swLat = bounds.getSouthWest().lat();
+                                        let neLng = bounds.getNorthEast().lng();
+                                        let neLat = bounds.getNorthEast().lat();
+
+                                        // Minimum margin in degrees (~10 meters roughly)
+                                        const margin = 0.0001;
+
+                                        // Ensure bbox width is at least margin
+                                        if (neLng - swLng < margin) {
+                                            swLng -= margin / 2;
+                                            neLng += margin / 2;
+                                        }
+
+                                        // Ensure bbox height is at least margin
+                                        if (neLat - swLat < margin) {
+                                            swLat -= margin / 2;
+                                            neLat += margin / 2;
+                                        }
+
+                                        const safeBbox = `${swLng},${swLat},${neLng},${neLat}`;
+
+                                        const ndwiUrl = `https://ndvi-api-212349273966.us-central1.run.app/ndvi?bbox=${safeBbox}&start_date=2023-02-01&end_date=2023-02-10`;
+
+                                        console.log('NDWI URL:', ndwiUrl);
+
+                                        // Create LatLngBounds object for GroundOverlay with adjusted bounds
+                                        const adjustedBounds = new window.google.maps.LatLngBounds(
+                                            { lat: swLat, lng: swLng },
+                                            { lat: neLat, lng: neLng }
+                                        );
+
+                                        return (
+                                            <React.Fragment key={polygon.id}>
+                                                <Polygon
+                                                    paths={polygon.path}
+                                                    options={{
+                                                        fillColor: '#4CAF50',
+                                                        fillOpacity: selectedPolygon === polygon.id ? 0.6 : 0.4,
+                                                        strokeColor: selectedPolygon === polygon.id ? '#FF4500' : '#32CD32',
+                                                        strokeWeight: selectedPolygon === polygon.id ? 2 : 1,
+                                                        clickable: true,
+                                                    }}
+                                                    onClick={() => setSelectedPolygon(polygon.id)}
+                                                />
+                                                <GroundOverlay url={ndwiUrl} bounds={adjustedBounds} options={{ opacity: 0.6 }} />
+                                            </React.Fragment>
+                                        );
+                                    })}
+
                                 </GoogleMap>
                             </LoadScript>
 
@@ -365,7 +416,56 @@ export default function GIS() {
                         >
                             {drawingMode ? 'Cancel Drawing' : 'Draw Polygon'}
                         </button>
+                        <div className="flex absolute right-[31rem] top-[26rem] gap-4 bg-gray-900 p-1.5 rounded-lg text-white w-max select-none">
+                            {/* Sentinel-2 toggle */}
+                            <div className="relative">
+                                <button
+                                    onClick={toggleSentinel}
+                                    className={`min-w-[100px] px-4 py-1 rounded-md focus:outline-none${sentinelOpen ? 'bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
+                                >
+                                    Sentinel-2 {sentinelOpen ? '▲' : '▼'}
+                                </button>
 
+                                {sentinelOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg p-3 z-20">
+                                        <label className="flex items-center space-x-2 mb-2 cursor-pointer">
+                                            <input type="checkbox" defaultChecked className="form-checkbox text-blue-500" />
+                                            <span>Sentinel-2 S2 <span className="text-sm text-gray-400">(10m)</span></span>
+                                        </label>
+                                        <label className="flex items-center space-x-2 mb-2 cursor-pointer">
+                                            <input type="checkbox" defaultChecked className="form-checkbox text-blue-500" />
+                                            <span>My Crops</span>
+                                        </label>
+                                        <label className="flex items-center space-x-2 mb-2 cursor-pointer">
+                                            <input type="checkbox" defaultChecked className="form-checkbox text-blue-500" />
+                                            <span>Crop Classification</span>
+                                        </label>
+                                        {/* Add more satellite options here */}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* NDVI toggle */}
+                            <div className="relative">
+                                <button
+                                    onClick={toggleNdvi}
+                                    className={`min-w-[60px] px-4 py-1 rounded-md focus:outline-none
+            ${ndviOpen ? 'bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
+                                >
+                                    NDVI {ndviOpen ? '▲' : '▼'}
+                                </button>
+
+                                {ndviOpen && (
+                                    <div className="absolute top-full left-0 mt-2 w-36 bg-gray-800 rounded-md shadow-lg p-3 z-20 flex flex-col">
+                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md">NDVI </button>
+                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md mt-1">NDRE</button>
+                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md mt-1">RECI</button>
+                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md mt-1">NDMI</button>
+                                        {/* Add more NDVI options here */}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         <div className="flex items-center justify-between p-1 px-2 bg-teal-800 text-white rounded-b-xl">
                             <div className="flex justify-start ">
                                 <button className="bg-teal-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
