@@ -346,14 +346,14 @@ export default function GIS() {
                                             onLoad={(drawingManagerInstance) => {
                                                 setDrawingManager(drawingManagerInstance);
                                             }}
-                                            onPolygonComplete={onPolygonComplete}
-                                            options={{
+                                            onPolygonComplete={onPolygonComplete}                                            options={{
                                                 drawingControl: false,
                                                 polygonOptions: {
                                                     fillColor: '#4CAF50',
-                                                    fillOpacity: 0.4,
+                                                    fillOpacity: 0, // Make fill transparent
                                                     strokeColor: '#32CD32',
-                                                    strokeWeight: 1,
+                                                    strokeWeight: 0, // Hide the border
+                                                    strokeOpacity: 0, // Make stroke transparent
                                                     clickable: true,
                                                     editable: true,
                                                     draggable: true,
@@ -399,14 +399,14 @@ export default function GIS() {
                                         );
 
                                         return (
-                                            <React.Fragment key={polygon.id}>
-                                                <Polygon
+                                            <React.Fragment key={polygon.id}>                                                <Polygon
                                                     paths={polygon.path}
                                                     options={{
                                                         fillColor: '#4CAF50',
-                                                        fillOpacity: selectedPolygon === polygon.id ? 0.6 : 0.4,
-                                                        strokeColor: selectedPolygon === polygon.id ? '#FF4500' : '#32CD32',
-                                                        strokeWeight: selectedPolygon === polygon.id ? 2 : 1,
+                                                        fillOpacity: 0, // Make fill transparent
+                                                        strokeColor: '#32CD32',
+                                                        strokeWeight: 0, // Hide the border
+                                                        strokeOpacity: 0, // Make stroke transparent
                                                         clickable: true,
                                                     }}
                                                     onClick={() => setSelectedPolygon(polygon.id)}
