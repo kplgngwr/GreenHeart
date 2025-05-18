@@ -1,112 +1,20 @@
 import React from 'react';
-import { Cpu, Monitor, BarChart, ShoppingCart, Leaf, MapPin, Quote, TrendingUp, Truck, ArrowRight, ArrowDown, Users, Briefcase, ShoppingBag } from 'lucide-react';
+import { motion } from 'framer-motion';
+import {
+  CheckCircle,
+  Globe,
+  Layers,
+  Activity,
+  Zap,
+  MapPin,
+  BarChart
+} from 'lucide-react';
 
-const features = [
-  {
-    title: "AI-Powered Farming",
-    description: "AI-based crop recommendations, growth predictions, and pest detection.",
-    icon: <Cpu className="w-10 h-10 text-green-500" />,
-    link: "#"
-  },
-  {
-    title: "IoT-Enabled Farm Management",
-    description: "Real-time monitoring of soil health, irrigation systems, and weather conditions.",
-    icon: <Monitor className="w-10 h-10 text-green-500" />,
-    link: "#"
-  },
-  {
-    title: "Data-Driven Decision Making",
-    description: "Farmers receive actionable insights based on detailed analytics and market demand predictions.",
-    icon: <BarChart className="w-10 h-10 text-green-500" />,
-    link: "#"
-  },
-  {
-    title: "Farm-to-Market Marketplace",
-    description: "Direct access for consumers and businesses to purchase fresh produce directly from farmers.",
-    icon: <ShoppingCart className="w-10 h-10 text-green-500" />,
-    link: "#"
-  },
-  {
-    title: "Sustainable Practices",
-    description: "Use of minimal resources, reduction of waste, and emphasis on organic and eco-friendly farming.",
-    icon: <Leaf className="w-10 h-10 text-green-500" />,
-    link: "#"
-  },
-];
-
-const steps = [
-  {
-    title: "Land Leasing & Team Assignment",
-    description: "GreenHeart leases land to farmers and assigns specialized teams.",
-    icon: <MapPin className="w-8 h-8 text-green-500" />
-  },
-  {
-    title: "Data Collection & Analysis",
-    description: "IoT sensors and drones monitor farm conditions, sending data to AI-powered systems.",
-    icon: <Cpu className="w-8 h-8 text-green-500" />
-  },
-  {
-    title: "Farm Management & Crop Recommendations",
-    description: "Farmers receive real-time insights and crop guidance.",
-    icon: <BarChart className="w-8 h-8 text-green-500" />
-  },
-  {
-    title: "Market Demand & Harvesting",
-    description: "Production is aligned with market demand to minimize waste.",
-    icon: <TrendingUp className="w-8 h-8 text-green-500" />
-  },
-  {
-    title: "Farm-to-Market Delivery",
-    description: "Produce is delivered to buyers through the GreenHeart marketplace.",
-    icon: <Truck className="w-8 h-8 text-green-500" />
-  },
-];
-
-const benefits = [
-  {
-    category: "For Farmers",
-    icon: <Users className="w-10 h-10 text-green-500" />,
-    points: [
-      "Increased yields through data-driven farming techniques.",
-      "Access to expert advice and educational resources.",
-      "Secure and transparent lease management.",
-    ]
-  },
-  {
-    category: "For Businesses",
-    icon: <Briefcase className="w-10 h-10 text-green-500" />,
-    points: [
-      "Consistent supply of quality produce.",
-      "Transparent farming practices with traceability of all products.",
-      "Convenient, direct-to-supplier marketplace.",
-    ]
-  },
-  {
-    category: "For Consumers",
-    icon: <ShoppingBag className="w-10 h-10 text-green-500" />,
-    points: [
-      "Fresh, high-quality produce directly from farms.",
-      "Full transparency on the farming processes and product quality.",
-      "Access to seasonal crops and personalized recommendations.",
-    ]
-  }
-];
-
-const testimonials = [
-  {
-    text: "GreenHeart’s AI-driven recommendations turned our farm around, increasing our crop yield by 30% in just one season.",
-  },
-  {
-    text: "The farm-to-market marketplace helped us reach new customers directly, cutting out the middleman.",
-  },
-  {
-    text: "As a farmer, the real-time insights GreenHeart provided allowed us to make better decisions and maximize our returns.",
-  },
-];
-
-function Home() {
+export default function Home() {
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="min-h-screen ">
+
+
       <div className="video-container relative h-[70vh] w-full overflow-hidden">
         <video autoPlay loop muted playsInline className="background-video absolute top-1/2 left-1/2 w-full h-full object-cover transform -translate-x-1/2 -translate-y-1/2">
           <source src="/bcg3.mp4" type="video/mp4" />
@@ -117,156 +25,241 @@ function Home() {
         </div>
       </div>
 
-      <div className="text-center py-10 px-5 bg-gray-100">
-        <h1 className="text-4xl font-bold text-gray-900">Connect Farmers and Buyers. Grow Your Business Together</h1>
-        <p className="text-lg text-green-700 mt-3">Green Heart Marketplace is a digital B2B platform that simplifies agricultural transactions, ensuring fair prices and efficient delivery.</p>
-      </div>
+      {/* Challenges Section */}
+      {/* Challenges Section */}
+      <section id="challenges" className="py-20 px-6 bg-teal-50">
+        <motion.h2
+          className="text-4xl font-bold text-teal-800 text-center mb-12"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          The Challenge We Aim to Address
+        </motion.h2>
 
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            Key Features
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center max-w-6xl mx-auto">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow p-6 flex flex-col items-center text-center hover:shadow-lg transition duration-300 w-full max-w-sm"
-              >
-                <div className="mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {feature.description}
-                </p>
-                <a
-                  href={feature.link}
-                  className="mt-auto text-green-600 font-medium hover:underline"
-                >
-                  Learn More &rarr;
-                </a>
-              </div>
-            ))}
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 text-teal-700">
+          {/* Left column: Intro & Conclusion */}
+          <div className="space-y-6">
+            <p className="leading-relaxed">
+              Every season, millions of Indian farmers decide what to grow by relying on tradition,
+              neighbors, or past trends—without knowing the real suitability or market potential for
+              each crop.
+            </p>
+            <p className="leading-relaxed">
+              The result? Monocultures, unexpected price crashes, and wasted opportunity on even the
+              most fertile lands. GreenHeart steps in with data-driven, localized insights that bring
+              confidence back to planting decisions.
+            </p>
           </div>
-        </div>
-      </section>
 
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            How It Works
-          </h2>
-          <div className="relative">
-            {/* Horizontal line connecting the steps */}
-            <div className="relative flex flex-col md:flex-row justify-between items-center">
-              {steps.map((step, index) => (
-                <React.Fragment key={index}>
-                  <div className="flex flex-col items-center text-center md:w-1/5 relative z-10 mb-8 md:mb-0">
-                    <div className="bg-white border-2 border-green-500 rounded-full w-16 h-16 flex items-center justify-center mb-4 shadow-lg hover:shadow-xl transition">
-                      {step.icon}
-                    </div>
-                    <h3 className="text-lg font-semibold mb-2 px-2">{step.title}</h3>
-                    <p className="text-gray-600 text-sm px-2">{step.description}</p>
-                  </div>
-                  {index !== steps.length - 1 && (
-                    <div className="flex items-center justify-center my-4 md:my-0">
-                      {/* Show down arrow on mobile and right arrow on desktop */}
-                      <ArrowDown className="w-6 h-6 text-green-500 block md:hidden" />
-                      <ArrowRight className="w-6 h-6 text-green-500 hidden md:block" />
-                    </div>
-                  )}
-                </React.Fragment>
-              ))}
+          {/* Right column: Bullet list with icons */}
+          <div className="space-y-6">
+            <div className="flex items-start">
+              <CheckCircle className="mt-1 mr-4 h-7 w-7 text-teal-600" />
+              <span>Whether a crop truly suits their soil profile, water availability, and local climate</span>
+            </div>
+            <div className="flex items-start">
+              <CheckCircle className="mt-1 mr-4 h-6 w-6 text-teal-600" />
+              <span>Whether market demand for that crop is rising, stable, or declining</span>
+            </div>
+            <div className="flex items-start">
+              <CheckCircle className="mt-1 mr-4 h-9 w-9 text-teal-600" />
+              <span>How to segment their land optimally between short-cycle, staple, and long-term plantation crops</span>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            Benefits of GreenHeart
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {benefits.map((item, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transition transform hover:-translate-y-2 hover:shadow-2xl"
-              >
-                <div className="mb-4">
-                  {item.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-4">{item.category}</h3>
-                <ul className="list-disc list-inside text-gray-600 space-y-2">
-                  {item.points.map((point, i) => (
-                    <li key={i}>{point}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+
+      {/* Stats & Facts Section */}
+      <section id="stats" className="py-20 px-6 bg-white">
+        <motion.h2
+          className="text-4xl font-bold text-teal-800 text-center mb-12"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          Quick Stats & Facts
+        </motion.h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          <motion.div
+            className="p-8 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-600 text-white text-center shadow-2xl"
+            whileHover={{ y: -10 }}
+          >
+            <CheckCircle className="mx-auto mb-4 h-12 w-12" />
+            <div className="text-5xl font-bold">35%</div>
+            <p className="uppercase tracking-wide mt-2">Yield Increase</p>
+          </motion.div>
+
+          <motion.div
+            className="p-8 rounded-2xl bg-teal-50 border-2 border-teal-300 text-teal-800 text-center shadow-lg"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Globe className="mx-auto mb-4 h-12 w-12 text-teal-600" />
+            <div className="text-5xl font-bold">20%</div>
+            <p className="mt-2">Cost Reduction</p>
+          </motion.div>
+
+          <motion.div
+            className="p-8 rounded-2xl bg-teal-100 text-teal-800 text-center shadow-lg flex flex-col items-center"
+            whileHover={{ x: 10 }}
+          >
+            <Layers className="mb-4 h-12 w-12 text-teal-600" />
+            <div className="text-4xl font-bold">100+</div>
+            <p className="mt-2">Districts Covered</p>
+          </motion.div>
+
+          <motion.div
+            className="p-8 rounded-2xl bg-white text-teal-700 text-center shadow-lg"
+            whileHover={{ rotate: 2 }}
+          >
+            <BarChart className="mx-auto mb-4 h-12 w-12 text-teal-600" />
+            <h3 className="text-xl font-semibold mb-2">Key Languages</h3>
+            <div className="grid grid-cols-2">
+              <p>Hindi</p>
+              <p>Marathi</p>
+              <p>Punjabi</p>
+              <p>Tamil & more</p>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            Testimonials
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center text-center transition transform hover:-translate-y-2 hover:shadow-2xl"
-              >
-                <Quote className="w-8 h-8 text-green-500 mb-4" />
-                <p className="text-gray-600 italic">
-                  "{testimonial.text}"
-                </p>
+      {/* Core Features Section */}
+      <section id="features" className="py-20 px-6 bg-teal-50">
+        <motion.h2
+          className="text-4xl font-bold text-teal-800 text-center mb-12"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          Core Features
+        </motion.h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+          {[
+            {
+              icon: <Activity className="h-8 w-8 text-teal-600" />,
+              title: 'Smart Land Zoning',
+              desc: 'Auto-divide your fields with satellite & terrain data for optimal zones.'
+            },
+            {
+              icon: <Zap className="h-8 w-8 text-teal-600" />,
+              title: 'AI Recommendations',
+              desc: 'Deep learning suggests best crops based on cost, yield & market trends.'
+            },
+            {
+              icon: <MapPin className="h-8 w-8 text-teal-600" />,
+              title: 'Regional Insights',
+              desc: 'Localized forecasts & risk analysis powered by district-level data.'
+            },
+            {
+              icon: <CheckCircle className="h-8 w-8 text-teal-600" />,
+              title: 'Voice Advisory',
+              desc: 'AI calls & WhatsApp alerts in multiple languages for easy access.'
+            },
+            {
+              icon: <Globe className="h-8 w-8 text-teal-600" />,
+              title: 'Sensor Monitoring',
+              desc: 'Integrate IoT & NDVI for real-time crop health tracking.'
+            },
+            {
+              icon: <Layers className="h-8 w-8 text-teal-600" />,
+              title: 'Insurance Validation',
+              desc: 'Satellite data-driven anomaly detection speeds up claims.'
+            }
+          ].map((f, i) => (
+            <motion.div
+              key={i}
+              className="p-8 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-transform"
+              whileHover={{ scale: 1.03 }}
+            >
+              <div className="mb-4 flex items-center justify-center">
+                {f.icon}
               </div>
-            ))}
-          </div>
+              <h3 className="text-2xl font-semibold text-teal-800 mb-2 text-center">
+                {f.title}
+              </h3>
+              <p className="text-teal-600 text-center">{f.desc}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
-      <section className="py-16 ">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">
-            Ready to Revolutionize Your Farm?
-          </h2>
-          <p className="text-lg mb-8">
-            Join GreenHeart and start revolutionizing your farm today. Experience our innovative platform firsthand and transform your agricultural practices.
-          </p>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4 mb-8">
-            <a
-              href="/demo"
-              className="px-6 py-3 border-2 bg-white text-green-600 rounded-lg font-semibold hover:bg-gray-100 transition duration-300"
+      {/* USP Section */}
+      <section id="usp" className="py-20 px-6 bg-white">
+        <motion.h2
+          className="text-4xl font-bold text-teal-800 text-center mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          Unique Selling Propositions
+        </motion.h2>
+        <div className="max-w-4xl mx-auto space-y-6 text-teal-700">
+          {[
+            'Smart Zoning + Auto Planning',
+            'Localized AI Recommendations',
+            'Voice-Based Reporting',
+            'Pattern Recognition + Drone-Zone Generation',
+            'Ground Sensor & Insurance Validation'
+          ].map((usp, idx) => (
+            <motion.div
+              key={idx}
+              className="flex items-start space-x-4 text-xl"
+              whileHover={{ x: 5 }}
             >
-              Request a Demo
-            </a>
-            <a
-              href="/join"
-              className="px-6 py-3 bg-green-700 text-white rounded-lg font-semibold hover:bg-green-800 transition duration-300"
-            >
-              Join GreenHeart and Start Revolutionizing Your Farm Today
-            </a>
+              <CheckCircle className="mt-1 h-8 w-8 text-teal-600" />
+              <p className="font-medium">{usp}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Impact & Benefits Section */}
+      <section id="impact" className="py-20 px-6 bg-teal-50">
+        <motion.h2
+          className="text-4xl font-bold text-teal-800 text-center mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          Impact & Benefits
+        </motion.h2>
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 text-teal-700">
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold text-teal-800">Farmer Empowerment</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Empowers small & marginal farmers with AI-driven land zoning.</li>
+              <li>Enables data-backed decisions to boost income.</li>
+              <li>Reduces dependency on middlemen & outdated advice systems.</li>
+            </ul>
           </div>
-          <p className="text-sm">
-            For businesses, investors, or potential collaborators, please{' '}
-            <a
-              href="/contact"
-              className="underline font-medium hover:text-gray-200"
-            >
-              contact us
-            </a>.
-          </p>
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold text-teal-800">Productivity & Economic Impact</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>25–35% yield increase via optimized inputs and planning.</li>
+              <li>15–20% cost reduction through targeted spraying & water efficiency.</li>
+              <li>Creates rural digital jobs in agri-data analytics & drone ops.</li>
+            </ul>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold text-teal-800">Risk Reduction & Insurance Confidence</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Predictive analytics & early warnings reduce crop failure risk.</li>
+              <li>Verifiable satellite & sensor data boosts insurer confidence.</li>
+              <li>Anomaly reports speed up claim processing.</li>
+            </ul>
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-2xl font-semibold text-teal-800">Sustainability & Food Security</h3>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Promotes crop rotation & biodiversity for soil health.</li>
+              <li>Supports climate-resilient agriculture initiatives.</li>
+              <li>Contributes to stable food supply & rural prosperity.</li>
+            </ul>
+          </div>
         </div>
       </section>
     </div>
   );
 }
-
-export default Home;

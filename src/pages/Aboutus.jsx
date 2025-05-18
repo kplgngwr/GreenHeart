@@ -1,58 +1,99 @@
 import React from 'react';
+import { motion } from 'framer-motion';
+import { Flag, Eye, Users } from 'lucide-react';
 import missionImage from '/mission.png';
 import visionImage from '/vision.png';
-import team1Image from '/team1.jpg';
 import team2Image from '/team2.jpg';
 
-function Aboutus() {
+export default function Aboutus() {
   return (
-    <div className="p-6 bg-gray-100 text-gray-900 font-sans ">
-      <header className="flex justify-center items-center mb-10 text-center">
-        <p className="text-3xl mt-4 text-green-800">Discover our journey and <span className="font-bold"> mission</span>  to promote <span className="font-bold"> sustainable</span>  agriculture.</p>
+    <div className="p-8 bg-teal-50 text-gray-900 font-sans">
+      {/* Header */}
+      <header className="max-w-5xl mx-auto text-center mb-16">
+        <motion.h1
+          className="text-4xl md:text-5xl font-bold text-teal-800"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          Discover our journey and <span className="text-teal-700">mission</span> to promote{' '}
+          <span className="text-teal-700">sustainable</span> agriculture.
+        </motion.h1>
       </header>
 
-      <section className="flex flex-col gap-5 py-10">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-5 animate-fadeInUp">
-          <img src={missionImage} alt="Our Mission" className="w-72 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105" />
-          <div className="max-w-lg">
-            <h2 className="text-5xl font-bold text-green-700">Our Mission</h2>
-            <p className="text-gray-600 font-semibold">We aim to connect farmers and consumers through a sustainable platform that ensures fair trade and eco-friendly practices.</p>
-          </div>
-        </div>
+      {/* Mission & Vision */}
+      <section className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
+        <motion.div
+          className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center text-center"
+          whileHover={{ scale: 1.03 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          <img
+            src={missionImage}
+            alt="Our Mission"
+            className="w-64 h-40 object-cover rounded-lg mb-6 shadow-md"
+          />
+          <h2 className="text-3xl font-semibold text-teal-800 mb-4">Our Mission</h2>
+          <p className="text-teal-700 leading-relaxed">
+            We aim to connect farmers and consumers through a sustainable platform that ensures fair trade
+            and eco-friendly practices.
+          </p>
+        </motion.div>
 
-        <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-5 animate-fadeInUp">
-          <img src={visionImage} alt="Our Vision" className="w-72 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105" />
-          <div className="max-w-lg">
-            <h2 className="text-5xl font-bold text-green-700">Our Vision</h2>
-            <p className="text-gray-600 font-semibold">To create a world where agriculture is sustainable, transparent, and beneficial for all stakeholders involved and a thriving agricultural ecosystem where farmers are empowered, consumers have access to fresh, quality produce, and the planet is protected.</p>
-          </div>
-        </div>
+        <motion.div
+          className="bg-white rounded-2xl shadow-lg p-8 flex flex-col items-center text-center"
+          whileHover={{ scale: 1.03 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        >
+          <img
+            src={visionImage}
+            alt="Our Vision"
+            className="w-64 h-40 object-cover rounded-lg mb-6 shadow-md"
+          />
+          <h2 className="text-3xl font-semibold text-teal-800 mb-4">Our Vision</h2>
+          <p className="text-teal-700 leading-relaxed">
+            To create a world where agriculture is transparent and beneficial for all stakeholders—
+            empowering farmers and protecting our planet.
+          </p>
+        </motion.div>
       </section>
 
-      <div className="text-center mt-10 py-10 p-5 bg-gray-50 rounded-lg shadow-lg transition-transform duration-300 hover:translate-y-[-5px] hover:shadow-xl">
-        <h2 className=" text-5xl font-bold text-green-700 mb-10">Meet Our Team : Techno Tuners </h2>
-        <div className="flex flex-col md:flex-row justify-center gap-10">
-          <div className="text-center animate-fadeIn">
-            <img src="https://i.postimg.cc/MHPR61RZ/image.png" alt="Garvit Saluja" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Ashit Rai</h3>
-          </div>
-          <div className="text-center animate-fadeIn">
-            <img src={team2Image} alt="Kapil Gangwar" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Kapil Gangwar</h3>
-          </div>
-          <div className="text-center animate-fadeIn">
-            <img src="https://i.postimg.cc/KYJWyHzd/image.png" alt="Alok Kumar Yadav" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Alok Kumar Yadav</h3>
-          </div>
-          
-          <div className="text-center animate-fadeIn">
-            <img src="https://i.postimg.cc/cCHhBxBH/image.png" alt="Kapil Gangwar" className="w-36 h-36 rounded-full shadow-lg transition-transform duration-300 hover:scale-110" />
-            <h3 className="text-xl text-gray-900 mt-2 font-semibold ">Bhumi Kapoor</h3>
-          </div>
+      {/* Team Section */}
+      <section className="max-w-6xl mx-auto mt-20 text-center">
+        <motion.h2
+          className="text-4xl font-bold text-teal-800 mb-10"
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          Meet Our Team&nbsp;— Techno Tuners
+        </motion.h2>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
+          {[
+            { name: 'Ashit Rai', img: "https://i.postimg.cc/MHPR61RZ/image.png" },
+            { name: 'Kapil Gangwar', img: team2Image },
+            { name: 'Alok Kumar Yadav', img: 'https://i.postimg.cc/KYJWyHzd/image.png' },
+            { name: 'Bhumi Kapoor', img: 'https://i.postimg.cc/cCHhBxBH/image.png' }
+          ].map((member) => (
+            <motion.div
+              key={member.name}
+              className="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center"
+              whileHover={{ translateY: -5 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
+              <img
+                src={member.img}
+                alt={member.name}
+                className="w-32 h-32 rounded-full object-cover mb-4 shadow-md"
+              />
+              <h3 className="text-xl font-semibold text-teal-800">{member.name}</h3>
+            </motion.div>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
 
-export default Aboutus;
+
