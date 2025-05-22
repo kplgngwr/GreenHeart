@@ -59,7 +59,7 @@ export default function Aboutus() {
       </section>
 
       {/* Team Section */}
-      <section className="max-w-6xl mx-auto mt-20 text-center">
+      {/* <section className="max-w-6xl mx-auto mt-20 text-center">
         <motion.h2
           className="text-4xl font-bold text-teal-800 mb-10"
           initial={{ opacity: 0, y: 10 }}
@@ -91,7 +91,7 @@ export default function Aboutus() {
             </motion.div>
           ))}
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }
