@@ -10,6 +10,7 @@ import PolygonDronePanel from "../Components/PolygonDronePanel";
 import InsuranceValidationModal from "../Components/InsuranceValidationModal";
 import toast, { Toaster } from "react-hot-toast";
 import ReportModal from "../Components/ReportModal";
+import SvgMaskedOverlay from "../Components/SvgMaskedOverlay";
 
 
 const containerStyle = {
@@ -50,7 +51,8 @@ export default function GIS() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const toggleSentinel = () => setSentinelOpen((prev) => !prev);
     const toggleNdvi = () => setNdviOpen((prev) => !prev);
-
+    const startDate = "2025-02-28";
+    const endDate = "2025-05-28";
     const toggleChat = () => setChatOpen((open) => !open);
     const cropData = [
         {
@@ -205,9 +207,6 @@ export default function GIS() {
             alert(`Crop ${selectedCrop} allocated to polygon ${selectedPolygon}`);
         }
     };
-
-
-    // Function to disallocate crop from selected polygon
     // Function to deallocate crop from selected polygon
     const deallocateCrop = () => {
         if (selectedPolygon && polygonCrops[selectedPolygon]) {
@@ -259,42 +258,44 @@ export default function GIS() {
     const [drawingMode, setDrawingMode] = useState(false);
     const [drawingManager, setDrawingManager] = useState(null);
     const [customPolygons, setCustomPolygons] = useState([]);
+
+    // on drawing complete
     const onPolygonComplete = (polygon) => {
-        // Get polygon path
-        const path = polygon.getPath().getArray();
-        const polygonCoords = path.map(coord => ({
-            lat: coord.lat(),
-            lng: coord.lng()
+        const path = polygon.getPath().getArray().map(p => ({
+            lat: p.lat(),
+            lng: p.lng(),
         }));
+        const id = `poly-${Date.now()}`;
 
-        // Create a unique ID for the new polygon
-        const newPolygonId = `custom-${Date.now()}`;
-
-        // Add to custom polygons
-        setCustomPolygons(prev => [
-            ...prev,
-            { id: newPolygonId, path: polygonCoords }
-        ]);
-
-        // Make the new polygon selectable
-        polygon.addListener('click', () => {
-            setSelectedPolygon(newPolygonId);
-
-            // Apply selection styling
-            polygon.setOptions({
-                fillOpacity: 0.6,
-                strokeColor: '#FF4500',
-                strokeWeight: 2
-            });
+        // listen for click to re-select, if you need
+        polygon.addListener("click", () => {
+            /* optional selection logic */
         });
 
-        // Set this as the selected polygon
-        setSelectedPolygon(newPolygonId);
-
-        // Turn off drawing mode after polygon is complete
-        setDrawingMode(false);
-        drawingManager.setDrawingMode(null);
+        // store
+        setCustomPolygons((prev) => [...prev, { id, path }]);
     };
+
+    // compute bbox string with a tiny margin
+    const bboxForPath = (path) => {
+        const lats = path.map(p => p.lat), lngs = path.map(p => p.lng);
+        let minLat = Math.min(...lats),
+            maxLat = Math.max(...lats),
+            minLng = Math.min(...lngs),
+            maxLng = Math.max(...lngs);
+
+        const margin = 0.0001;
+        if (maxLat - minLat < margin) {
+            minLat -= margin / 2;
+            maxLat += margin / 2;
+        }
+        if (maxLng - minLng < margin) {
+            minLng -= margin / 2;
+            maxLng += margin / 2;
+        }
+        return `${minLng},${minLat},${maxLng},${maxLat}`;
+    };
+
     // Compute bounds from polygon path
     const getPolygonBounds = (path) => {
         const bounds = new window.google.maps.LatLngBounds();
@@ -314,6 +315,112 @@ export default function GIS() {
         }
     };
 
+    // Example usage
+    const handleCropImage = async (imageUrl, polygonId) => {
+        try {
+            // Get polygon coordinates from your data
+            const polygon = customPolygons.find(p => p.id === polygonId) ||
+                geoJsonData.features.find(f => f.properties.id === polygonId);
+
+            if (!polygon) {
+                throw new Error('Polygon not found');
+            }
+
+            const polygonCoords = polygon.path || polygon.geometry.coordinates[0].map(coord => ({
+                lat: coord[1],
+                lng: coord[0]
+            }));
+
+            const croppedImageUrl = await cropImageToPolygon(imageUrl, polygonCoords);
+
+            // Now you can use the cropped image URL
+            // For example, display it or save it
+            console.log('Cropped image URL:', croppedImageUrl);
+
+            // You might want to set it to state
+            // setCroppedImage(croppedImageUrl);
+
+            return croppedImageUrl;
+        } catch (error) {
+            console.error('Error cropping image:', error);
+            toast.error('Failed to crop image');
+        }
+    };
+
+    // Function to crop image according to polygon shape
+    const cropImageToPolygon = (imageUrl, polygonCoords) => {
+        return new Promise((resolve, reject) => {
+            // Create a canvas element
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Load the image
+            const img = new Image();
+            img.crossOrigin = 'Anonymous'; // Handle CORS if needed
+
+            img.onload = () => {
+                // Set canvas dimensions to match image
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Draw the image on canvas
+                ctx.drawImage(img, 0, 0);
+
+                // Create a clipping path from the polygon
+                ctx.beginPath();
+
+                // Convert geo coordinates to pixel coordinates
+                // This assumes you have a function to convert lat/lng to pixel x/y
+                const pixelCoords = convertGeoToPixelCoordinates(polygonCoords, img.width, img.height);
+
+                // Draw the polygon path
+                pixelCoords.forEach((coord, index) => {
+                    if (index === 0) {
+                        ctx.moveTo(coord.x, coord.y);
+                    } else {
+                        ctx.lineTo(coord.x, coord.y);
+                    }
+                });
+
+                ctx.closePath();
+
+                // Clip and clear everything outside the polygon
+                ctx.globalCompositeOperation = 'destination-in';
+                ctx.fill();
+
+                // Convert canvas to image data URL
+                const croppedImageUrl = canvas.toDataURL('image/png');
+                resolve(croppedImageUrl);
+            };
+
+            img.onerror = () => {
+                reject(new Error('Failed to load image'));
+            };
+
+            img.src = imageUrl;
+        });
+    };
+
+    // Helper function to convert geo coordinates to pixel coordinates
+    const convertGeoToPixelCoordinates = (geoCoords, imgWidth, imgHeight) => {
+        // You need to implement this based on your map projection and bounds
+        // This is a simplified example
+        const bounds = mapRef.current.getBounds();
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+
+        return geoCoords.map(coord => {
+            // Convert lat/lng to normalized position (0-1)
+            const x = (coord.lng - sw.lng()) / (ne.lng() - sw.lng());
+            const y = (ne.lat() - coord.lat) / (ne.lat() - sw.lat());
+
+            // Convert to pixel coordinates
+            return {
+                x: x * imgWidth,
+                y: y * imgHeight
+            };
+        });
+    };
 
     const handleValidate = (formData) => {
         toast.success('Insurance validated report will be sent on mail');
@@ -332,7 +439,7 @@ export default function GIS() {
                     <div className="flex flex-col  flex-1  rounded-lg overflow-hidden">
                         {/* Map (fixed height) */}
                         <div className="h-[400px]">
-                            <LoadScript libraries={['drawing']} googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY}>
+                            <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY} libraries={["drawing"]}>
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
                                     center={startingPoint}
@@ -342,79 +449,57 @@ export default function GIS() {
                                 >
                                     {mapLoaded && (
                                         <DrawingManager
-                                            onLoad={(drawingManagerInstance) => {
-                                                setDrawingManager(drawingManagerInstance);
+                                            onLoad={(drawingManager) => {
+                                                setDrawingManager(drawingManager);
+                                                drawingManager.setDrawingMode(null);
                                             }}
-                                            onPolygonComplete={onPolygonComplete} options={{
+                                            onPolygonComplete={onPolygonComplete}
+                                            options={{
                                                 drawingControl: false,
                                                 polygonOptions: {
-                                                    fillColor: '#4CAF50',
-                                                    fillOpacity: 0, // Make fill transparent
-                                                    strokeColor: '#32CD32',
-                                                    strokeWeight: 0, // Hide the border
-                                                    strokeOpacity: 0, // Make stroke transparent
+                                                    fillColor: "#4CAF50",
+                                                    fillOpacity: 0.2,
+                                                    strokeColor: "#4CAF50",
                                                     clickable: true,
                                                     editable: true,
-                                                    draggable: true,
+                                                    draggable: false,
                                                 },
                                             }}
                                         />
                                     )}
 
-                                    {customPolygons.map((polygon) => {
-                                        const bounds = getPolygonBounds(polygon.path);
-
-                                        // Extract bounds coordinates
-                                        let swLng = bounds.getSouthWest().lng();
-                                        let swLat = bounds.getSouthWest().lat();
-                                        let neLng = bounds.getNorthEast().lng();
-                                        let neLat = bounds.getNorthEast().lat();
-
-                                        // Minimum margin in degrees (~10 meters roughly)
-                                        const margin = 0.0001;
-
-                                        // Ensure bbox width is at least margin
-                                        if (neLng - swLng < margin) {
-                                            swLng -= margin / 2;
-                                            neLng += margin / 2;
-                                        }
-
-                                        // Ensure bbox height is at least margin
-                                        if (neLat - swLat < margin) {
-                                            swLat -= margin / 2;
-                                            neLat += margin / 2;
-                                        }
-
-                                        const safeBbox = `${swLng},${swLat},${neLng},${neLat}`;
-                                        console.log('Safe Bbox:', safeBbox);
-                                        const Url = `https://sentinel-api-509090043598.us-central1.run.app/vegetation_index?bbox=${safeBbox}&index_type=${indexType}&start_date=2025-02-28&end_date=2025-05-28`;
-
-                                        console.log('Vegetation Index URL:', Url);
-
-                                        // Create LatLngBounds object for GroundOverlay with adjusted bounds
-                                        const adjustedBounds = new window.google.maps.LatLngBounds(
-                                            { lat: swLat, lng: swLng },
-                                            { lat: neLat, lng: neLng }
-                                        );
+                                    {customPolygons.map(({ id, path }) => {
+                                        // sentinel image URL
+                                        const bbox = bboxForPath(path);
+                                        const imageUrl =
+                                            `https://sentinel-api-509090043598.us-central1.run.app/vegetation_index`
+                                            + `?bbox=${bbox}`
+                                            + `&index_type=${indexType}`
+                                            + `&start_date=${startDate}`
+                                            + `&end_date=${endDate}`;
 
                                         return (
-                                            <React.Fragment key={polygon.id}>                                                <Polygon
-                                                paths={polygon.path}
-                                                options={{
-                                                    fillColor: '#4CAF50',
-                                                    fillOpacity: 0, // Make fill transparent
-                                                    strokeColor: '#32CD32',
-                                                    strokeWeight: 0, // Hide the border
-                                                    strokeOpacity: 0, // Make stroke transparent
-                                                    clickable: true,
-                                                }}
-                                                onClick={() => setSelectedPolygon(polygon.id)}
-                                            />
-                                                <GroundOverlay url={Url} bounds={adjustedBounds} options={{ opacity: 0.6 }} />
+                                            <React.Fragment key={id}>
+                                                {/* draw the polygon border (optional) */}
+                                                <Polygon
+                                                    paths={path}
+                                                    options={{
+                                                        fillOpacity: 0,
+                                                        strokeColor: "#FF4500",
+                                                        strokeWeight: 2,
+                                                    }}
+                                                />
+
+                                                {/* our SVG‐clipped overlay */}
+                                                <SvgMaskedOverlay
+                                                    map={mapRef.current}
+                                                    path={path}
+                                                    imageUrl={imageUrl}
+                                                    id={id}
+                                                />
                                             </React.Fragment>
                                         );
                                     })}
-
                                 </GoogleMap>
                             </LoadScript>
 
@@ -492,6 +577,12 @@ export default function GIS() {
                                             onClick={() => setIndexType('ndmi')}
                                         >
                                             NDMI
+                                        </button>
+                                        <button
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndvi' ? 'bg-blue-700' : ''}`}
+                                            onClick={() => setIndexType('ndvi')}
+                                        >
+                                            NDVI
                                         </button>
                                     </div>
                                 )}
