@@ -32,8 +32,7 @@ export default function GIS() {
     const [lands, setLands] = useState([]);
     const toggle = setter => setter(prev => !prev);
     const tabs = ['Crop info', 'Chart', 'Activities', 'Drone Allocation'];
-    const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-
+    const [indexType, setIndexType] = useState('NDVI');
     const [modalOpen, setModalOpen] = useState(false);
     // Add new state variables for polygon selection and crop allocation
     const [selectedPolygon, setSelectedPolygon] = useState(null);
@@ -53,7 +52,6 @@ export default function GIS() {
     const toggleNdvi = () => setNdviOpen((prev) => !prev);
 
     const toggleChat = () => setChatOpen((open) => !open);
-    const NDWI = `https://ndvi-api-212349273966.us-central1.run.app/ndvi?bbox=${startingPoint.lng},${startingPoint.lat},${startingPoint.lng},${startingPoint.lat}&start_date=2023-02-01&end_date=2023-02-10`;
     const cropData = [
         {
             name: 'Wheat',
@@ -388,10 +386,10 @@ export default function GIS() {
                                         }
 
                                         const safeBbox = `${swLng},${swLat},${neLng},${neLat}`;
+                                        console.log('Safe Bbox:', safeBbox);
+                                        const Url = `https://sentinel-api-509090043598.us-central1.run.app/vegetation_index?bbox=${safeBbox}&index_type=${indexType}&start_date=2025-02-28&end_date=2025-05-28`;
 
-                                        const ndwiUrl = `https://ndvi-api-212349273966.us-central1.run.app/ndvi?bbox=${safeBbox}&start_date=2023-02-01&end_date=2023-02-10`;
-
-                                        console.log('NDWI URL:', ndwiUrl);
+                                        console.log('Vegetation Index URL:', Url);
 
                                         // Create LatLngBounds object for GroundOverlay with adjusted bounds
                                         const adjustedBounds = new window.google.maps.LatLngBounds(
@@ -412,7 +410,7 @@ export default function GIS() {
                                                 }}
                                                 onClick={() => setSelectedPolygon(polygon.id)}
                                             />
-                                                <GroundOverlay url={ndwiUrl} bounds={adjustedBounds} options={{ opacity: 0.6 }} />
+                                                <GroundOverlay url={Url} bounds={adjustedBounds} options={{ opacity: 0.6 }} />
                                             </React.Fragment>
                                         );
                                     })}
@@ -459,23 +457,42 @@ export default function GIS() {
                                 )}
                             </div>
 
-                            {/* NDVI toggle */}
+                            {/* Vegetation Index toggle */}
                             <div className="relative">
                                 <button
                                     onClick={toggleNdvi}
-                                    className={`min-w-[60px] px-4 py-1 rounded-md focus:outline-none
+                                    className={`min-w-[100px] px-4 py-1 rounded-md focus:outline-none
             ${ndviOpen ? 'bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
                                 >
-                                    NDVI {ndviOpen ? '▲' : '▼'}
+                                    {indexType.toUpperCase()} {ndviOpen ? '▲' : '▼'}
                                 </button>
 
                                 {ndviOpen && (
                                     <div className="absolute top-full left-0 mt-2 w-36 bg-gray-800 rounded-md shadow-lg p-3 z-20 flex flex-col">
-                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md">NDVI </button>
-                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md mt-1">NDRE</button>
-                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md mt-1">RECI</button>
-                                        <button className="text-left py-1 hover:bg-gray-700 rounded-md mt-1">NDMI</button>
-                                        {/* Add more NDVI options here */}
+                                        <button
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndwi' ? 'bg-blue-700' : ''}`}
+                                            onClick={() => setIndexType('ndwi')}
+                                        >
+                                            NDWI
+                                        </button>
+                                        <button
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'evi' ? 'bg-blue-700' : ''}`}
+                                            onClick={() => setIndexType('evi')}
+                                        >
+                                            EVI
+                                        </button>
+                                        <button
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndre' ? 'bg-blue-700' : ''}`}
+                                            onClick={() => setIndexType('ndre')}
+                                        >
+                                            NDRE
+                                        </button>
+                                        <button
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndmi' ? 'bg-blue-700' : ''}`}
+                                            onClick={() => setIndexType('ndmi')}
+                                        >
+                                            NDMI
+                                        </button>
                                     </div>
                                 )}
                             </div>
