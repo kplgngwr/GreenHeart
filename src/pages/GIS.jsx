@@ -103,12 +103,61 @@ export default function GIS() {
     const [modalOpenValidation, setModalOpenValidation] = useState(false);
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
-
+    const [selectedVegetationIndex, setSelectedVegetationIndex] = useState('NDVI');
+    const vegetationIndices = ['ndvi', 'evi', 'ndwi', 'savi', 'lai'];
+    const [selectedPolygonData, setSelectedPolygonData] = useState(null);
     // Inside your GIS component, after your map is ready…
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef(null);
     const [geoJsonData, setGeoJsonData] = useState(null);
 
+
+    // Add this function to handle vegetation index selection
+    const handleVegetationIndexChange = (e) => {
+        setSelectedVegetationIndex(e.target.value);
+
+        // If a polygon is selected, update the vegetation index overlay
+        if (selectedPolygon) {
+            // Refresh the overlay with the new index
+            updateVegetationOverlay(selectedPolygon, e.target.value);
+        }
+    };
+
+    // Function to update vegetation overlay on a polygon
+    const updateVegetationOverlay = (polygonId, indexType) => {
+        // Find the polygon data
+        let polygonPath;
+
+        // Check if it's a custom polygon or from GeoJSON
+        const customPoly = customPolygons.find(p => p.id === polygonId);
+
+        if (customPoly) {
+            polygonPath = customPoly.path;
+        } else if (geoJsonData) {
+            // Find the feature in GeoJSON data
+            const feature = geoJsonData.features.find(f => f.properties.id === polygonId);
+            if (feature) {
+                // Convert GeoJSON coordinates to {lat, lng} format
+                polygonPath = feature.geometry.coordinates[0].map(coord => ({
+                    lat: coord[1],
+                    lng: coord[0]
+                }));
+            }
+        }
+
+        if (!polygonPath) return;
+
+        // Calculate bbox for the polygon
+        const bbox = bboxForPath(polygonPath);
+
+        // Set the overlay data
+        setSelectedPolygonData({
+            id: polygonId,
+            path: polygonPath,
+            indexType: indexType,
+            bbox: bbox
+        });
+    };
     // Handle map load and set map reference
     const handleMapLoad = useCallback((mapInstance) => {
         mapRef.current = mapInstance;
@@ -153,7 +202,7 @@ export default function GIS() {
                         const cropColor = cropType ? cropColors[cropType] || '#4CAF50' : '#3388ff';
 
                         return {
-                            fillColor: cropColor,
+                            fillColor: 'transparent',
                             fillOpacity: selectedPolygon === polygonId ? 0.6 : 0.4,
                             strokeColor: selectedPolygon === polygonId ? '#FF4500' : '#32CD32',
                             strokeWeight: selectedPolygon === polygonId ? 2 : 1,
@@ -184,6 +233,27 @@ export default function GIS() {
                             strokeColor: '#FF4500',
                             strokeWeight: 2
                         });
+                    });
+                    // Add click event listener for polygons
+                    mapRef.current.data.addListener('click', (event) => {
+                        const feature = event.feature;
+
+                        // Access properties correctly
+                        const properties = {};
+                        feature.forEachProperty((value, property) => {
+                            properties[property] = value;
+                        });
+                        console.log("Properties:", properties);
+
+                        // Get the ID directly from properties or use index
+                        const polygonId = properties.id || feature.getId();
+                        console.log("Selected polygon with ID:", polygonId);
+
+                        // Set the selected polygon
+                        setSelectedPolygon(polygonId);
+
+                        // Update the vegetation overlay with the currently selected index
+                        updateVegetationOverlay(polygonId, selectedVegetationIndex);
                     });
                 })
                 .catch(error => {
@@ -296,14 +366,7 @@ export default function GIS() {
         return `${minLng},${minLat},${maxLng},${maxLat}`;
     };
 
-    // Compute bounds from polygon path
-    const getPolygonBounds = (path) => {
-        const bounds = new window.google.maps.LatLngBounds();
-        path.forEach((point) => {
-            bounds.extend(point);
-        });
-        return bounds;
-    };
+
     // Function to toggle drawing mode
     const toggleDrawingMode = () => {
         if (drawingMode) {
@@ -315,112 +378,8 @@ export default function GIS() {
         }
     };
 
-    // Example usage
-    const handleCropImage = async (imageUrl, polygonId) => {
-        try {
-            // Get polygon coordinates from your data
-            const polygon = customPolygons.find(p => p.id === polygonId) ||
-                geoJsonData.features.find(f => f.properties.id === polygonId);
 
-            if (!polygon) {
-                throw new Error('Polygon not found');
-            }
 
-            const polygonCoords = polygon.path || polygon.geometry.coordinates[0].map(coord => ({
-                lat: coord[1],
-                lng: coord[0]
-            }));
-
-            const croppedImageUrl = await cropImageToPolygon(imageUrl, polygonCoords);
-
-            // Now you can use the cropped image URL
-            // For example, display it or save it
-            console.log('Cropped image URL:', croppedImageUrl);
-
-            // You might want to set it to state
-            // setCroppedImage(croppedImageUrl);
-
-            return croppedImageUrl;
-        } catch (error) {
-            console.error('Error cropping image:', error);
-            toast.error('Failed to crop image');
-        }
-    };
-
-    // Function to crop image according to polygon shape
-    const cropImageToPolygon = (imageUrl, polygonCoords) => {
-        return new Promise((resolve, reject) => {
-            // Create a canvas element
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-
-            // Load the image
-            const img = new Image();
-            img.crossOrigin = 'Anonymous'; // Handle CORS if needed
-
-            img.onload = () => {
-                // Set canvas dimensions to match image
-                canvas.width = img.width;
-                canvas.height = img.height;
-
-                // Draw the image on canvas
-                ctx.drawImage(img, 0, 0);
-
-                // Create a clipping path from the polygon
-                ctx.beginPath();
-
-                // Convert geo coordinates to pixel coordinates
-                // This assumes you have a function to convert lat/lng to pixel x/y
-                const pixelCoords = convertGeoToPixelCoordinates(polygonCoords, img.width, img.height);
-
-                // Draw the polygon path
-                pixelCoords.forEach((coord, index) => {
-                    if (index === 0) {
-                        ctx.moveTo(coord.x, coord.y);
-                    } else {
-                        ctx.lineTo(coord.x, coord.y);
-                    }
-                });
-
-                ctx.closePath();
-
-                // Clip and clear everything outside the polygon
-                ctx.globalCompositeOperation = 'destination-in';
-                ctx.fill();
-
-                // Convert canvas to image data URL
-                const croppedImageUrl = canvas.toDataURL('image/png');
-                resolve(croppedImageUrl);
-            };
-
-            img.onerror = () => {
-                reject(new Error('Failed to load image'));
-            };
-
-            img.src = imageUrl;
-        });
-    };
-
-    // Helper function to convert geo coordinates to pixel coordinates
-    const convertGeoToPixelCoordinates = (geoCoords, imgWidth, imgHeight) => {
-        // You need to implement this based on your map projection and bounds
-        // This is a simplified example
-        const bounds = mapRef.current.getBounds();
-        const ne = bounds.getNorthEast();
-        const sw = bounds.getSouthWest();
-
-        return geoCoords.map(coord => {
-            // Convert lat/lng to normalized position (0-1)
-            const x = (coord.lng - sw.lng()) / (ne.lng() - sw.lng());
-            const y = (ne.lat() - coord.lat) / (ne.lat() - sw.lat());
-
-            // Convert to pixel coordinates
-            return {
-                x: x * imgWidth,
-                y: y * imgHeight
-            };
-        });
-    };
 
     const handleValidate = (formData) => {
         toast.success('Insurance validated report will be sent on mail');
@@ -465,6 +424,14 @@ export default function GIS() {
                                                     draggable: false,
                                                 },
                                             }}
+                                        />
+                                    )}
+                                    {selectedPolygonData && (
+                                        <SvgMaskedOverlay
+                                            map={mapRef.current}
+                                            path={selectedPolygonData.path}
+                                            imageUrl={`https://sentinel-api-509090043598.us-central1.run.app/vegetation_index?bbox=${selectedPolygonData.bbox}&index_type=${selectedPolygonData.indexType}&start_date=${startDate}&end_date=${endDate}`}
+                                            id={`veg-${selectedPolygonData.id}`}
                                         />
                                     )}
 
@@ -693,6 +660,19 @@ export default function GIS() {
                                                             disabled
                                                         />
                                                     </div>
+                                                </div>
+                                                <div className="form-group mt-2">
+                                                    <label htmlFor="vegetationIndex">Vegetation Index:</label>
+                                                    <select
+                                                        id="vegetationIndex"
+                                                        className="form-control"
+                                                        value={selectedVegetationIndex}
+                                                        onChange={handleVegetationIndexChange}
+                                                    >
+                                                        {vegetationIndices.map(index => (
+                                                            <option key={index} value={index}>{index}</option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                                 <div className="flex gap-2">
                                                     {/* Current Crop */}
