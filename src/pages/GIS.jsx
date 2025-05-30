@@ -110,8 +110,71 @@ export default function GIS() {
     const [mapLoaded, setMapLoaded] = useState(false);
     const mapRef = useRef(null);
     const [geoJsonData, setGeoJsonData] = useState(null);
+    const [currentLocation, setCurrentLocation] = useState({ lat: 30.762357, lng: 76.598619 }); // Default fallback
+    // Add a useEffect to get the user's location when component mounts
+    useEffect(() => {
+        const requestLocationAccess = async () => {
+            try {
+                const permission = await navigator.permissions.query({ name: 'geolocation' });
+                if (permission.state === 'granted') {
+                    getLocation();
+                } else if (permission.state === 'prompt') {
+                    toast.info("Please allow location access for better experience.");
+                    getLocation();
+                } else {
+                    toast.warning("Location access denied. Using default location.");
+                }
+            } catch (error) {
+                console.error("Error requesting location permission:", error);
+                toast.error("Could not request location permission. Using default location.");
+            }
+        };
 
+        const getLocation = () => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        console.log("Location:", latitude, longitude);
+                        setCurrentLocation({ lat: latitude, lng: longitude });
+                        if (setLocation) {
+                            fetchLocationName(latitude, longitude);
+                        }
+                    },
+                    (error) => {
+                        console.error("Error getting location:", error);
+                        toast.error("Could not get your location. Using default location.");
+                    },
+                    { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+                );
+            } else {
+                toast.error("Geolocation is not supported by this browser. Using default location.");
+            }
+        };
 
+        requestLocationAccess();
+    }, []);
+
+    const fetchLocationName = async (latitude, longitude) => {
+        try {
+            const response = await axios.get(
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+            );
+
+            if (response.data.results && response.data.results.length > 0) {
+                const addressComponents = response.data.results[0].address_components;
+                const city = addressComponents.find(comp =>
+                    comp.types.includes("locality") || comp.types.includes("administrative_area_level_1")
+                )?.long_name || "";
+
+                if (setLocation) {
+                    setLocation(city);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching location name:", error);
+        }
+    };
     // Add this function to handle vegetation index selection
     const handleVegetationIndexChange = (e) => {
         setSelectedVegetationIndex(e.target.value);
@@ -401,7 +464,7 @@ export default function GIS() {
                             <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY} libraries={["drawing"]}>
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
-                                    center={startingPoint}
+                                    center={currentLocation}
                                     zoom={15}
                                     onLoad={handleMapLoad}
                                     mapTypeId="hybrid"
