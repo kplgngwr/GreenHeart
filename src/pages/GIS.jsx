@@ -12,6 +12,7 @@ import toast, { Toaster } from "react-hot-toast";
 import ReportModal from "../Components/ReportModal";
 import SvgMaskedOverlay from "../Components/SvgMaskedOverlay";
 import DailyCropPrice from "../Components/DailyCropPrice";
+import { PriceVariationChart } from "../Components/PriceVariationChart";
 
 
 const containerStyle = {
@@ -105,7 +106,7 @@ const endDate = "2025-05-31";
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
     const [selectedVegetationIndex, setSelectedVegetationIndex] = useState('NDVI');
-    const vegetationIndices = ['ndvi', 'evi', 'ndwi', 'savi', 'lai'];
+    const vegetationIndices = ['ndwi', 'evi', 'ndre', 'ndmi','ndvi'];
     const [selectedPolygonData, setSelectedPolygonData] = useState(null);
     // Inside your GIS component, after your map is ready…
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -718,7 +719,7 @@ const endDate = "2025-05-31";
                                                             onChange={handleVegetationIndexChange}
                                                         >
                                                             {vegetationIndices.map(index => (
-                                                                <option key={index} value={index}>{index}</option>
+                                                                <option key={index} value={index}>{index.toUpperCase()}</option>
                                                             ))}
                                                         </select>
                                                     </div>
@@ -1074,6 +1075,8 @@ const endDate = "2025-05-31";
                             )}
 
                         </div>
+                        <PriceVariationChart />
+
                     </div>
 
                     {/* Right Sidebar */}
@@ -1236,6 +1239,7 @@ const endDate = "2025-05-31";
                 onClose={() => setIsModalOpen(false)}
                 previousCrop="Rice"
             />
+
         </div>
     );
 }

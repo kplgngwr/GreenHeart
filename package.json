@@ -15,6 +15,7 @@
     "@react-google-maps/api": "^2.20.6",
     "@tailwindcss/vite": "^4.0.9",
     "axios": "^1.9.0",
+    "dayjs": "^1.11.13",
     "firebase": "^11.4.0",
     "framer-motion": "^12.12.1",
     "leaflet": "^1.9.4",
