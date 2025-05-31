@@ -11,6 +11,7 @@ import InsuranceValidationModal from "../Components/InsuranceValidationModal";
 import toast, { Toaster } from "react-hot-toast";
 import ReportModal from "../Components/ReportModal";
 import SvgMaskedOverlay from "../Components/SvgMaskedOverlay";
+import DailyCropPrice from "../Components/DailyCropPrice";
 
 
 const containerStyle = {
@@ -51,8 +52,8 @@ export default function GIS() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const toggleSentinel = () => setSentinelOpen((prev) => !prev);
     const toggleNdvi = () => setNdviOpen((prev) => !prev);
-    const startDate = "2025-02-28";
-    const endDate = "2025-05-28";
+    const [startDate, setStartDate] = useState("2025-05-28");
+const endDate = "2025-05-31";
     const toggleChat = () => setChatOpen((open) => !open);
     const cropData = [
         {
@@ -493,24 +494,23 @@ export default function GIS() {
                                         <SvgMaskedOverlay
                                             map={mapRef.current}
                                             path={selectedPolygonData.path}
-                                            imageUrl={`https://sentinel-api-509090043598.us-central1.run.app/vegetation_index?bbox=${selectedPolygonData.bbox}&index_type=${selectedPolygonData.indexType}&start_date=${startDate}&end_date=${endDate}`}
+                                            imageUrl={`https://sentinel-api-509090043598.us-central1.run.app/vegetation_index?bbox=${selectedPolygonData.bbox}&index_type=${selectedPolygonData.indexType}&start_date=${startDate}&end_date=${endDate}&auto_scale=true`}
                                             id={`veg-${selectedPolygonData.id}`}
                                         />
                                     )}
 
                                     {customPolygons.map(({ id, path }) => {
-                                        // sentinel image URL
                                         const bbox = bboxForPath(path);
                                         const imageUrl =
                                             `https://sentinel-api-509090043598.us-central1.run.app/vegetation_index`
                                             + `?bbox=${bbox}`
                                             + `&index_type=${indexType}`
                                             + `&start_date=${startDate}`
-                                            + `&end_date=${endDate}`;
+                                            + `&end_date=${endDate}`
+                                            + `&auto_scale=true`;
 
                                         return (
                                             <React.Fragment key={id}>
-                                                {/* draw the polygon border (optional) */}
                                                 <Polygon
                                                     paths={path}
                                                     options={{
@@ -519,8 +519,6 @@ export default function GIS() {
                                                         strokeWeight: 2,
                                                     }}
                                                 />
-
-                                                {/* our SVG‐clipped overlay */}
                                                 <SvgMaskedOverlay
                                                     map={mapRef.current}
                                                     path={path}
@@ -530,11 +528,33 @@ export default function GIS() {
                                             </React.Fragment>
                                         );
                                     })}
+                                    <div className="absolute bottom-4 left-4 bg-white p-2 rounded shadow">
+                                        <h4 className="font-bold text-black mb-2">Vegetation Indexes</h4>
+                                        <div className="flex flex-col space-y-2">
+                                            <div className="flex items-center">
+                                                <div className="w-20 h-4 bg-gradient-to-r from-blue-300 via-cyan-400 to-blue-600"></div>
+                                                <span className="ml-2 text-xs text-black">NDWI (Normalized Difference Water Index)</span>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="w-20 h-4 bg-gradient-to-r from-cyan-400 via-cyan-600 to-cyan-900"></div>
+                                                <span className="ml-2 text-xs text-black">EVI (Enhanced Vegetation Index)</span>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="w-20 h-4 bg-gradient-to-r from-red-300 via-red-500 to-red-700"></div>
+                                                <span className="ml-2 text-xs text-black">NDRE (Normalized Difference Red Edge)</span>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="w-20 h-4 bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-500"></div>
+                                                <span className="ml-2 text-xs text-black">NDMI (Normalized Difference Moisture Index)</span>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <div className="w-20 h-4 bg-gradient-to-r from-lime-100 via-lime-300 to-lime-500"></div>
+                                                <span className="ml-2 text-xs text-black">NDVI (Normalized Difference Vegetation Index)</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </GoogleMap>
                             </LoadScript>
-
-
-
                         </div>
                         {/* Add this button somewhere in your UI */}
                         <button
@@ -618,6 +638,7 @@ export default function GIS() {
                                 )}
                             </div>
                         </div>
+                        {/* Start Date Selector */}
                         <div className="flex items-center justify-between p-1 px-2 bg-teal-800 text-white rounded-b-xl">
                             <div className="flex justify-start ">
                                 <button className="bg-teal-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
@@ -625,28 +646,16 @@ export default function GIS() {
                                 </button>
                             </div>
 
-                            <div className="flex space-x-3 overflow-x-auto ">
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    13 Jan'25
-                                </button>
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    23 Jan'25
-                                </button>
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    02 Feb'25
-                                </button>
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    12 Feb'25
-                                </button>
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    17 Feb'25
-                                </button>
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    04 Mar'25
-                                </button>
-                                <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-500">
-                                    09 Mar'25
-                                </button>
+                            <div className="flex space-x-3 overflow-x-auto">
+                                {['27 May', '28 May', '29 May', '30 May', '31 May', '01 Jun'].map((date) => (
+                                    <button
+                                        key={date}
+                                        className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-green-500"
+                                        onClick={() => setStartDate(`${date}'25`)}
+                                    >
+                                        {date}'25
+                                    </button>
+                                ))}
                             </div>
 
                             <div className="flex justify-end ">
@@ -688,23 +697,37 @@ export default function GIS() {
                                         )}
 
                                         {selectedPolygon && (
-                                            <div className="mt-4 bg-teal-700 p-4 rounded-lg">
-                                                <h2 className="text-xl text-white mb-4">Polygon Selection</h2>
+                                            <div className="mt-4 bg-teal-700 p-4 px-0 rounded-lg">
 
-                                                {/* Landmark Name */}
-                                                <div className="mb-4">
-                                                    <label className="block text-sm text-gray-400">Landmark Name</label>
-                                                    <input
-                                                        type="text"
-                                                        value="East Wellside Plot"  // This value should be dynamic based on your state or props
-                                                        className="bg-teal-700 text-white p-2 rounded w-full"
-                                                        disabled
-                                                    />
+                                                <div className="flex justify-between items-center mb-2">
+                                                    {/* Landmark Name */}
+                                                    <div className="">
+                                                        <label className="block text-sm text-white">Landmark Name</label>
+                                                        <input
+                                                            type="text"
+                                                            value={selectedPolygon}  // This value should be dynamic based on your state or props
+                                                            className="bg-gray-700 text-white p-2 rounded w-full"
+                                                            disabled
+                                                        />
+                                                    </div>
+                                                    <div className="">
+                                                        <label className="text-white block text-sm">Vegetation Index:</label>
+                                                        <select
+                                                            className="form-control w-full bg-gray-700 text-white p-2 rounded"
+                                                            value={selectedVegetationIndex}
+                                                            onChange={handleVegetationIndexChange}
+                                                        >
+                                                            {vegetationIndices.map(index => (
+                                                                <option key={index} value={index}>{index}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
                                                 </div>
+
                                                 <div className="flex gap-2">
                                                     {/* Survey/Khasra No. */}
-                                                    <div className="mb-4">
-                                                        <label className="block text-sm text-gray-400">Survey/Khasra No.</label>
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm text-white">Survey/Khasra No.</label>
                                                         <input
                                                             type="text"
                                                             value="105/7"  // This value should be dynamic
@@ -714,8 +737,8 @@ export default function GIS() {
                                                     </div>
 
                                                     {/* Polygon ID */}
-                                                    <div className="mb-4">
-                                                        <label className="block text-sm text-gray-400">Polygon ID</label>
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm text-white">Polygon ID</label>
                                                         <input
                                                             type="text"
                                                             value="92"  // This value should be dynamic
@@ -724,23 +747,11 @@ export default function GIS() {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="form-group mt-2">
-                                                    <label htmlFor="vegetationIndex">Vegetation Index:</label>
-                                                    <select
-                                                        id="vegetationIndex"
-                                                        className="form-control"
-                                                        value={selectedVegetationIndex}
-                                                        onChange={handleVegetationIndexChange}
-                                                    >
-                                                        {vegetationIndices.map(index => (
-                                                            <option key={index} value={index}>{index}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
+
                                                 <div className="flex gap-2">
                                                     {/* Current Crop */}
-                                                    <div className="mb-4">
-                                                        <label className="block text-sm text-gray-400">Current Crop</label>
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm text-white">Current Crop</label>
                                                         <select
                                                             value={selectedCrop}
                                                             onChange={(e) => setSelectedCrop(e.target.value)}
@@ -754,8 +765,8 @@ export default function GIS() {
 
                                                     </div>
                                                     {/* Irrigation */}
-                                                    <div className="mb-4">
-                                                        <label className="block text-sm text-gray-400">Irrigation</label>
+                                                    <div className="mb-2">
+                                                        <label className="block text-sm text-white">Irrigation</label>
                                                         <input
                                                             type="text"
                                                             value="Canal"  // This value should be dynamic
@@ -765,8 +776,8 @@ export default function GIS() {
                                                     </div>
                                                 </div>
                                                 {/* Growth Stage */}
-                                                <div className="mb-4">
-                                                    <label className="block text-sm text-gray-400">Growth Stage</label>
+                                                <div className="mb-2">
+                                                    <label className="block text-sm text-white">Growth Stage</label>
                                                     <input
                                                         type="text"
                                                         value="Vegetative (NDVI: 0.65)"  // This value should be dynamic
@@ -1151,10 +1162,9 @@ export default function GIS() {
                                         </div>
                                     )}
                                 </div>
-
-
-
-
+                                <div>
+                                <DailyCropPrice />
+                                </div>
                             </div>
                         </div>
 
