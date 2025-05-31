@@ -54,7 +54,7 @@ export default function GIS() {
     const toggleSentinel = () => setSentinelOpen((prev) => !prev);
     const toggleNdvi = () => setNdviOpen((prev) => !prev);
     const [startDate, setStartDate] = useState("2025-05-28");
-const endDate = "2025-05-31";
+    const endDate = "2025-05-31";
     const toggleChat = () => setChatOpen((open) => !open);
     const cropData = [
         {
@@ -106,7 +106,7 @@ const endDate = "2025-05-31";
 
     const [activeTab, setActiveTab] = useState(tabs[0]);
     const [selectedVegetationIndex, setSelectedVegetationIndex] = useState('NDVI');
-    const vegetationIndices = ['ndwi', 'evi', 'ndre', 'ndmi','ndvi'];
+    const vegetationIndices = ['ndwi', 'evi', 'ndre', 'ndmi', 'ndvi'];
     const [selectedPolygonData, setSelectedPolygonData] = useState(null);
     // Inside your GIS component, after your map is ready…
     const [mapLoaded, setMapLoaded] = useState(false);
@@ -160,7 +160,7 @@ const endDate = "2025-05-31";
     const fetchLocationName = async (latitude, longitude) => {
         try {
             const response = await axios.get(
-                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${import.meta.env.VITE_GOOGLE_KEY}`
             );
 
             if (response.data.results && response.data.results.length > 0) {
@@ -1166,7 +1166,7 @@ const endDate = "2025-05-31";
                                     )}
                                 </div>
                                 <div>
-                                <DailyCropPrice />
+                                    <DailyCropPrice />
                                 </div>
                             </div>
                         </div>

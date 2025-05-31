@@ -1,5 +1,7 @@
 // src/Components/PriceVariationChart.jsx
 import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import dayjs from 'dayjs'
 import {
   LineChart,
   Line,
@@ -9,37 +11,43 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
-import dayjs from 'dayjs'
-import axios from 'axios'
 
 // API constants
 const API_KEY = '579b464db66ec23bdd0000011751bb9238f341af54e65303a5da5956'
 const BASE_URL = 'https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24'
 
+// NOTE: Replace with your actual Google Maps API key if needed.
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_KEY
+
 export function PriceVariationChart() {
-  // State for location and filters
-  const [state, setState] = useState('Haryana')
-  const [district, setDistrict] = useState('Ambala')
-  const [commodity, setCommodity] = useState('Apple')
-  const [market, setMarket] = useState('')
-  
-  // Lists for dropdowns
+  // ── 1) Filters & pending from geolocation ─────────────────────────────────
+  const [state, setState] = useState('Select State')
+  const [district, setDistrict] = useState('Select District')
+  const [commodity, setCommodity] = useState('Select Commodity')
+  const [market, setMarket] = useState('Select Market')
+
+  const [pendingState, setPendingState] = useState(null)
+  const [pendingDistrict, setPendingDistrict] = useState(null)
+
+  // ── 2) Dropdown lists ────────────────────────────────────────────────────────
   const [statesList, setStatesList] = useState([])
   const [districtsList, setDistrictsList] = useState([])
   const [commoditiesList, setCommoditiesList] = useState([])
   const [marketsList, setMarketsList] = useState([])
-  
-  // Location status
-  const [locationStatus, setLocationStatus] = useState('idle') // idle, loading, success, error, denied
+
+  // ── 3) Geolocation state ─────────────────────────────────────────────────────
+  const [locationStatus, setLocationStatus] = useState('idle')
+  // status: 'idle' | 'loading' | 'success' | 'error' | 'denied'
   const [locationMessage, setLocationMessage] = useState('')
-  
-  // Chart data
+  const [location, setLocation] = useState(null)
+
+  // ── 4) Date window & chart data ─────────────────────────────────────────────
   const [last30Dates, setLast30Dates] = useState([])
   const [chartData, setChartData] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  // Build a 30-day sliding window (fixed "today" = 2025-05-31)
+  // ── 5) Build the last 30-day window (hardcoded "today" = 2025-05-30) ────────
   useEffect(() => {
     const today = dayjs('2025-05-30', 'YYYY-MM-DD')
     const dates = []
@@ -49,285 +57,371 @@ export function PriceVariationChart() {
     setLast30Dates(dates)
   }, [])
 
-  // Fetch states list on component mount
+  // ── 6) Geolocation helpers ─────────────────────────────────────────────────
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('error');
+      setLocationMessage('Geolocation is not supported by your browser.');
+      setLocation({ lat: 20.5937, lng: 78.9629 }); // fallback to India
+      return;
+    }
+  
+    setLocationStatus('loading');
+    setLocationMessage('Detecting location...');
+  
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ lat: latitude, lng: longitude });
+        setLocationStatus('success');
+        setLocationMessage(`Location detected: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
+  
+        // Reverse geocode to derive state & district names
+        try {
+          const geoRes = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+            params: {
+              latlng: `${latitude},${longitude}`,
+              key: import.meta.env.VITE_GOOGLE_KEY,
+            },
+          });
+  
+          console.log(geoRes.data);
+  
+          if (Array.isArray(geoRes.data.results)) {
+            let foundState = null;
+            let foundDistrict = null;
+  
+            // Loop through results and find state and district
+            for (const result of geoRes.data.results) {
+              for (const component of result.address_components) {
+                if (!foundState && component.types.includes('administrative_area_level_1')) {
+                  foundState = component.long_name;
+                }
+                if (!foundDistrict && component.types.includes('administrative_area_level_2')) {
+                  foundDistrict = component.long_name;
+                }
+                if (foundState && foundDistrict) break;
+              }
+              if (foundState && foundDistrict) break;
+            }
+  
+            // Set pending filters only if they exist in the dropdown lists
+            if (foundState && statesList.includes(foundState)) {
+              setPendingState(foundState);
+            }
+            if (foundDistrict && districtsList.includes(foundDistrict)) {
+              setPendingDistrict(foundDistrict);
+            }
+          }
+        } catch (geoErr) {
+          console.error('Reverse geocode error:', geoErr);
+          // Continue without updating pendingState if reverse fails
+        }
+      },
+      (err) => {
+        setLocationStatus('denied');
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            setLocationMessage('Location access denied. Using default location.');
+            break;
+          case err.POSITION_UNAVAILABLE:
+            setLocationMessage('Location information unavailable. Using default location.');
+            break;
+          case err.TIMEOUT:
+            setLocationMessage('Location request timed out. Using default location.');
+            break;
+          default:
+            setLocationMessage('Unknown geolocation error. Using default location.');
+        }
+        setLocation({ lat: 20.5937, lng: 78.9629 });
+      }
+    );
+  };
+  
+
+
+
+  const requestLocationAccess = async () => {
+    try {
+      const permission = await navigator.permissions.query({ name: 'geolocation' })
+      if (permission.state === 'granted' || permission.state === 'prompt') {
+        getLocation()
+      } else {
+        setLocationStatus('denied')
+        setLocationMessage('Location access denied. Using default location.')
+        setLocation({ lat: 20.5937, lng: 78.9629 })
+      }
+    } catch (permErr) {
+      console.error('Permissions API error:', permErr)
+      setLocationStatus('error')
+      setLocationMessage('Could not request location permission. Using default.')
+      setLocation({ lat: 20.5937, lng: 78.9629 })
+    }
+  }
+
+  // Request location on mount
+  useEffect(() => {
+    requestLocationAccess()
+  }, [])
+
+  // ── 7) Load the dropdown lists ───────────────────────────────────────────────
+
+  // 7a) Fetch states
   useEffect(() => {
     const fetchStates = async () => {
       try {
         const response = await axios.get(
-          `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${API_KEY}&format=json&limit=1000&distinct=State`
+          `${BASE_URL}?api-key=${API_KEY}&format=json&limit=1000&distinct=State`
         )
         if (response.data && response.data.records) {
-          const uniqueStates = [...new Set(response.data.records.map(record => record.State))]
-            .filter(state => state) // Remove empty values
+          const uniqueStates = [
+            ...new Set(response.data.records.map((r) => r.State)),
+          ]
+            .filter((s) => s)
             .sort()
           setStatesList(uniqueStates)
         }
-      } catch (error) {
-        console.error('Error fetching states:', error)
+      } catch (err) {
+        console.error('Error fetching states:', err)
       }
     }
-    
     fetchStates()
-    // Try to get user location automatically
-    getUserLocation()
   }, [])
 
-  // Fetch districts when state changes
+  // Apply pendingState once statesList is loaded
+  useEffect(() => {
+    if (pendingState && statesList.includes(pendingState)) {
+      setState(pendingState)
+      setPendingState(null)
+    }
+  }, [statesList, pendingState])
+
+  // 7b) Fetch districts whenever state changes
   useEffect(() => {
     if (!state) return
-    
     const fetchDistricts = async () => {
       try {
         const response = await axios.get(
-          `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${API_KEY}&format=json&limit=1000&filters[State]=${state}&distinct=District`
+          `${BASE_URL}?api-key=${API_KEY}&format=json&limit=1000&filters[State]=${encodeURIComponent(
+            state
+          )}&distinct=District`
         )
         if (response.data && response.data.records) {
-          const uniqueDistricts = [...new Set(response.data.records.map(record => record.District))]
-            .filter(district => district) // Remove empty values
+          const uniqueDistricts = [
+            ...new Set(response.data.records.map((r) => r.District)),
+          ]
+            .filter((d) => d)
             .sort()
           setDistrictsList(uniqueDistricts)
-          if (uniqueDistricts.length > 0 && !uniqueDistricts.includes(district)) {
-            setDistrict(uniqueDistricts[0])
-          }
         }
-      } catch (error) {
-        console.error('Error fetching districts:', error)
+      } catch (err) {
+        console.error('Error fetching districts:', err)
       }
     }
-    
     fetchDistricts()
   }, [state])
 
-  // Fetch commodities when district changes
+  // When statesList is updated, apply pendingState if present
+  useEffect(() => {
+    if (pendingState && statesList.includes(pendingState)) {
+      setState(pendingState);
+      setPendingState(null);
+    }
+  }, [statesList, pendingState]);
+
+  // When districtsList is updated, apply pendingDistrict if present
+  useEffect(() => {
+    if (pendingDistrict && districtsList.includes(pendingDistrict)) {
+      setDistrict(pendingDistrict);
+      setPendingDistrict(null);
+    }
+  }, [districtsList, pendingDistrict]);
+
+  // Apply pendingDistrict or default district
+  useEffect(() => {
+    if (pendingDistrict && districtsList.includes(pendingDistrict)) {
+      setDistrict(pendingDistrict)
+      setPendingDistrict(null)
+    } else if (!district && districtsList.length > 0) {
+      setDistrict(districtsList[0])
+    }
+  }, [districtsList, pendingDistrict])
+
+  // 7c) Fetch commodities whenever district changes
   useEffect(() => {
     if (!state || !district) return
-    
     const fetchCommodities = async () => {
       try {
         const response = await axios.get(
-          `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${API_KEY}&format=json&limit=1000&filters[State]=${state}&filters[District]=${district}&distinct=Commodity`
+          `${BASE_URL}?api-key=${API_KEY}&format=json&limit=1000&filters[State]=${encodeURIComponent(
+            state
+          )}&filters[District]=${encodeURIComponent(
+            district
+          )}&distinct=Commodity`
         )
         if (response.data && response.data.records) {
-          const uniqueCommodities = [...new Set(response.data.records.map(record => record.Commodity))]
-            .filter(commodity => commodity) // Remove empty values
+          const uniqueCommodities = [
+            ...new Set(response.data.records.map((r) => r.Commodity)),
+          ]
+            .filter((c) => c)
             .sort()
           setCommoditiesList(uniqueCommodities)
-          if (uniqueCommodities.length > 0 && !uniqueCommodities.includes(commodity)) {
-            setCommodity(uniqueCommodities[0])
-          }
         }
-      } catch (error) {
-        console.error('Error fetching commodities:', error)
+      } catch (err) {
+        console.error('Error fetching commodities:', err)
       }
     }
-    
     fetchCommodities()
   }, [state, district])
 
-  // Fetch markets when commodity changes
+  // Default commodity if none selected
+  useEffect(() => {
+    if (!commodity && commoditiesList.length > 0) {
+      setCommodity(commoditiesList[0])
+    }
+  }, [commoditiesList])
+
+  // 7d) Fetch markets whenever commodity changes
   useEffect(() => {
     if (!state || !district || !commodity) return
-    
     const fetchMarkets = async () => {
       try {
         const response = await axios.get(
-          `https://api.data.gov.in/resource/35985678-0d79-46b4-9ed6-6f13308a1d24?api-key=${API_KEY}&format=json&limit=1000&filters[State]=${state}&filters[District]=${district}&filters[Commodity]=${commodity}&distinct=Market`
+          `${BASE_URL}?api-key=${API_KEY}&format=json&limit=1000&filters[State]=${encodeURIComponent(
+            state
+          )}&filters[District]=${encodeURIComponent(
+            district
+          )}&filters[Commodity]=${encodeURIComponent(
+            commodity
+          )}&distinct=Market`
         )
         if (response.data && response.data.records) {
-          const uniqueMarkets = [...new Set(response.data.records.map(record => record.Market))]
-            .filter(market => market) // Remove empty values
+          const uniqueMarkets = [
+            ...new Set(response.data.records.map((r) => r.Market)),
+          ]
+            .filter((m) => m)
             .sort()
           setMarketsList(uniqueMarkets)
-          if (uniqueMarkets.length > 0 && market === '') {
-            setMarket(uniqueMarkets[0])
-          }
         }
-      } catch (error) {
-        console.error('Error fetching markets:', error)
+      } catch (err) {
+        console.error('Error fetching markets:', err)
       }
     }
-    
     fetchMarkets()
   }, [state, district, commodity])
 
-  // Get user location
-  const getUserLocation = () => {
-    setLocationStatus('loading')
-    setLocationMessage('Detecting your location...')
-    
-    if (!navigator.geolocation) {
-      setLocationStatus('error')
-      setLocationMessage('Geolocation is not supported by your browser')
-      return
+  // Default market if none selected
+  useEffect(() => {
+    if (!market && marketsList.length > 0) {
+      setMarket(marketsList[0])
     }
-    
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          const { latitude, longitude } = position.coords
-          setLocationMessage(`Location found: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`)
-          
-          // Reverse geocoding to get state and district
-          const response = await axios.get(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyDLQxMCWgu1lP7aXlzFpuVxVg1-Cn5AcT4&result_type=administrative_area_level_1|administrative_area_level_2`
-          )
-          
-          if (response.data.results && response.data.results.length > 0) {
-            let foundState = null
-            let foundDistrict = null
-            
-            response.data.results.forEach(result => {
-              result.address_components.forEach(component => {
-                if (component.types.includes('administrative_area_level_1')) {
-                  foundState = component.long_name
-                }
-                if (component.types.includes('administrative_area_level_2')) {
-                  foundDistrict = component.long_name
-                }
-              })
+  }, [marketsList])
+
+  // ── 8) Fetch price data when user clicks “Search Price Data” ──────────────
+  const fetchPriceData = async () => {
+    if (last30Dates.length === 0 || !market) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const points = []
+      let lastValidPrice = 0
+
+      for (const arrivalDate of last30Dates) {
+        const params = new URLSearchParams({
+          'api-key': API_KEY,
+          format: 'json',
+          limit: '1',
+          offset: '0',
+          'filters[State]': state,
+          'filters[District]': district,
+          'filters[Commodity]': commodity,
+          'filters[Arrival_Date]': arrivalDate,
+          'filters[Market]': market,
+        })
+
+        const url = `${BASE_URL}?${params.toString()}`
+        const res = await fetch(url)
+        if (!res.ok) {
+          throw new Error(`API returned ${res.status} for date ${arrivalDate}`)
+        }
+
+        const json = await res.json()
+        if (json.count > 0) {
+          const record = json.records[0]
+          const priceNum = Number(record.Modal_Price)
+
+          if (!isNaN(priceNum) && priceNum > 0) {
+            lastValidPrice = priceNum
+            points.push({
+              date: arrivalDate,
+              price: priceNum,
             })
-            
-            if (foundState && statesList.includes(foundState)) {
-              setState(foundState)
-              setLocationStatus('success')
-              setLocationMessage(`Location set to ${foundState}${foundDistrict ? `, ${foundDistrict}` : ''}`)
-            } else {
-              setLocationStatus('error')
-              setLocationMessage('Your location is not available in our database')
-            }
           } else {
-            setLocationStatus('error')
-            setLocationMessage('Could not determine your location')
+            points.push({
+              date: arrivalDate,
+              price: lastValidPrice,
+            })
           }
-        } catch (error) {
-          console.error('Error with geocoding:', error)
-          setLocationStatus('error')
-          setLocationMessage('Error determining your location')
-        }
-      },
-      (error) => {
-        setLocationStatus('denied')
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            setLocationMessage('Location access denied. Please enable location services.')
-            break
-          case error.POSITION_UNAVAILABLE:
-            setLocationMessage('Location information is unavailable')
-            break
-          case error.TIMEOUT:
-            setLocationMessage('Location request timed out')
-            break
-          default:
-            setLocationMessage('An unknown error occurred')
-        }
-      }
-    )
-  }
-
-// Fetch price data when search button is clicked
-const fetchPriceData = async () => {
-  if (last30Dates.length === 0 || !market) return
-  
-  setLoading(true)
-  setError(null)
-
-  try {
-    const points = []
-    let lastValidPrice = 0; // Track the last valid price
-
-    for (const arrivalDate of last30Dates) {
-      const params = new URLSearchParams({
-        'api-key': API_KEY,
-        format: 'json',
-        limit: '1',
-        offset: '0',
-        'filters[State]': state,
-        'filters[District]': district,
-        'filters[Commodity]': commodity,
-        'filters[Arrival_Date]': arrivalDate,
-        'filters[Market]': market,
-      })
-
-      const url = `${BASE_URL}?${params.toString()}`
-      const res = await fetch(url)
-      if (!res.ok) {
-        throw new Error(`API returned ${res.status} for date ${arrivalDate}`)
-      }
-
-      const json = await res.json()
-      if (json.count > 0) {
-        const record = json.records[0]
-        const priceNum = Number(record.Modal_Price)
-        
-        if (!isNaN(priceNum) && priceNum > 0) {
-          // Valid price found, update lastValidPrice
-          lastValidPrice = priceNum;
-          points.push({
-            date: arrivalDate,
-            price: priceNum,
-          })
         } else {
-          // Use last valid price if current price is zero or invalid
           points.push({
             date: arrivalDate,
             price: lastValidPrice,
           })
         }
-      } else {
-        // No data for this date, use last valid price
-        points.push({
-          date: arrivalDate,
-          price: lastValidPrice,
-        })
       }
+
+      setChartData(points.reverse()) // chronological (oldest first)
+    } catch (err) {
+      console.error(err)
+      setError(err.message || 'Failed to fetch price data')
+    } finally {
+      setLoading(false)
     }
-
-    // Reverse for chronological order (oldest first)
-    setChartData(points.reverse())
-  } catch (err) {
-    console.error(err)
-    setError(err.message || 'Failed to fetch price data')
-  } finally {
-    setLoading(false)
   }
-}
 
+  // ── 9) JSX ─────────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-7xl mx-auto p-4 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold mb-4">
-        Crop Price Variation (₹/100 kg)
-      </h2>
-      
+    <div className="max-w-7xl  p-4 bg-teal-800 rounded-xl mt-4 shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-white">Crop Price Variation (₹/100 kg)</h2>
+
       {/* Location status message */}
-      {locationStatus !== 'idle' && (
-        <div className={`mb-4 p-2 rounded ${
-          locationStatus === 'loading' ? 'bg-blue-100 text-blue-800' : 
-          locationStatus === 'success' ? 'bg-green-100 text-green-800' : 
-          'bg-yellow-100 text-yellow-800'
-        }`}>
+      {/* {locationStatus !== 'idle' && (
+        <div
+          className={`mb-4 p-2 rounded ${locationStatus === 'loading'
+              ? 'bg-blue-100 text-blue-800'
+              : locationStatus === 'success'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'
+            }`}
+        >
           <p>{locationMessage}</p>
           {locationStatus === 'denied' && (
-            <button 
-              onClick={getUserLocation}
+            <button
+              onClick={requestLocationAccess}
               className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
               Allow Location Access
             </button>
           )}
         </div>
-      )}
-      
-      {/* Filter selectors */}
-      <div className="flex gap-4 mb-6">
-        <div>
-          <label htmlFor="stateSelect" className="block text-sm font-medium text-gray-700 mb-1">
+      )} */}
+
+      {/* Filters */}
+      <div className="flex justify-between gap-4 mb-6 w-full">
+        <div className="w-full">
+          <label
+            htmlFor="stateSelect"
+            className="block text-sm font-medium text-white mb-1"
+          >
             State:
           </label>
           <select
             id="stateSelect"
             value={state}
             onChange={(e) => setState(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md"
           >
             {statesList.map((s) => (
               <option key={s} value={s}>
@@ -336,16 +430,19 @@ const fetchPriceData = async () => {
             ))}
           </select>
         </div>
-        
-        <div>
-          <label htmlFor="districtSelect" className="block text-sm font-medium text-gray-700 mb-1">
+
+        <div className="w-full">
+          <label
+            htmlFor="districtSelect"
+            className="block text-sm font-medium text-white mb-1"
+          >
             District:
           </label>
           <select
             id="districtSelect"
             value={district}
             onChange={(e) => setDistrict(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md"
             disabled={districtsList.length === 0}
           >
             {districtsList.map((d) => (
@@ -355,16 +452,19 @@ const fetchPriceData = async () => {
             ))}
           </select>
         </div>
-        
-        <div>
-          <label htmlFor="commoditySelect" className="block text-sm font-medium text-gray-700 mb-1">
+
+        <div className="w-full">
+          <label
+            htmlFor="commoditySelect"
+            className="block text-sm font-medium text-white mb-1"
+          >
             Commodity:
           </label>
           <select
             id="commoditySelect"
             value={commodity}
             onChange={(e) => setCommodity(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md"
             disabled={commoditiesList.length === 0}
           >
             {commoditiesList.map((c) => (
@@ -374,16 +474,19 @@ const fetchPriceData = async () => {
             ))}
           </select>
         </div>
-        
-        <div>
-          <label htmlFor="marketSelect" className="block text-sm font-medium text-gray-700 mb-1">
+
+        <div className="w-full">
+          <label
+            htmlFor="marketSelect"
+            className="block text-sm font-medium text-white mb-1"
+          >
             Market:
           </label>
           <select
             id="marketSelect"
             value={market}
             onChange={(e) => setMarket(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            className="mt-1 block w-full px-3 py-2 text-black border border-gray-300 bg-white rounded-md"
             disabled={marketsList.length === 0}
           >
             {marketsList.map((m) => (
@@ -393,19 +496,17 @@ const fetchPriceData = async () => {
             ))}
           </select>
         </div>
-        {/* Search button */}
-      <div className="flex justify-center mt-6 ">
-        <button
-          onClick={fetchPriceData}
-          className="px-6 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-          disabled={loading || !market}
-        >
-          {loading ? 'Loading...' : 'Search Price Data'}
-        </button>
-      </div>
-      </div>
 
-      
+        <div className="w-full mt-6">
+          <button
+            onClick={fetchPriceData}
+            disabled={loading || !market}
+            className="px-6 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 disabled:opacity-50"
+          >
+            {loading ? 'Loading...' : 'Search Price Data'}
+          </button>
+        </div>
+      </div>
 
       {/* Error message */}
       {error && (
@@ -414,7 +515,7 @@ const fetchPriceData = async () => {
         </div>
       )}
 
-      {/* Loading indicator */}
+      {/* Loading spinner */}
       {loading && (
         <div className="flex justify-center my-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-700"></div>
@@ -427,16 +528,27 @@ const fetchPriceData = async () => {
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{
-                top: 5,
-                right: 30,
-                left: 20,
-                bottom: 15,
-              }}
+              margin={{ top: 5, right: 30, left: 20, bottom: 15 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tick={{fontSize: 10}} interval={2} label={{ value: "Date", position: "bottom", offset: 0 }} />
-              <YAxis label={{ value: "Price (₹)/100KG", angle: 90, position: "left", offset: 5 }} />
+              <XAxis
+                dataKey="date"
+                tick={{ fontSize: 10 }}
+                interval={2}
+                label={{ value: 'Date', position: 'bottom', offset: 0 }}
+              />
+              <YAxis
+                label={{
+                  value: 'Price (₹)/100 KG',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: 5,
+                }}
+              />
+              <Tooltip
+                formatter={(value) => `₹${value}`}
+                labelFormatter={(label) => `Date: ${label}`}
+              />
               <Line
                 type="monotone"
                 dataKey="price"
@@ -445,9 +557,17 @@ const fetchPriceData = async () => {
                 dot={{ r: 3 }}
                 activeDot={{ r: 6 }}
                 label={({ x, y, value, index }) => (
-                  <text x={x} y={y - 20} fill="#3b82f6" fontSize={10} textAnchor="middle">
+                  <text
+                    x={x}
+                    y={y - 20}
+                    fill="#3b82f6"
+                    fontSize={10}
+                    textAnchor="middle"
+                  >
                     ₹{value}
-                    <tspan x={x} dy="4em">{chartData[index].date.split('/').slice(0, 2).join('/')}</tspan>
+                    <tspan x={x} dy="1.2em">
+                      {chartData[index].date.split('/').slice(0, 2).join('/')}
+                    </tspan>
                   </text>
                 )}
               />
@@ -456,9 +576,11 @@ const fetchPriceData = async () => {
         </div>
       )}
 
-      {/* No data */}
+      {/* No data message */}
       {!loading && !error && chartData.length === 0 && market && (
-        <div className="text-gray-600 text-center py-8">No price data available for the selected criteria.</div>
+        <div className="text-white text-center py-8">
+          No price data available for the selected criteria.
+        </div>
       )}
     </div>
   )
