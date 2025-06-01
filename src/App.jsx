@@ -14,6 +14,7 @@ import SignInPage from './pages/auth/SignInPage';
 import Resource from './pages/Resource';
 import Reasearch from './pages/Reasearch';
 import GIS from './pages/GIS';
+import Report from './Components/Report';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -33,6 +34,7 @@ function App() {
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/resource" element={<Resource />} />
         <Route path="/research" element={<Reasearch />} />
+        <Route path="/report" element={<Report />} />
       </Routes>
       <Footer />
     </div>
