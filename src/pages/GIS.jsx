@@ -17,10 +17,12 @@ import { PriceVariationChart } from "../Components/PriceVariationChart";
 
 const containerStyle = {
     width: '100%',
-    height: '400px',
+    height: '500px',
 };
 const startingPoint = { lat: 30.762357, lng: 76.598619 };
 
+
+// Add this component inside the GIS function component
 
 
 export default function GIS() {
@@ -156,6 +158,84 @@ export default function GIS() {
 
         requestLocationAccess();
     }, []);
+
+    // First, add the legend data at the top of the file
+    const NDVI_LEGEND = [
+        { min: 0.60, max: 0.70, color: "#1a9850", label: "Dense vegetation" },
+        { min: 0.50, max: 0.60, color: "#66bd63", label: "Dense vegetation" },
+        { min: 0.40, max: 0.50, color: "#a6d96a", label: "Moderate vegetation" },
+        { min: 0.30, max: 0.40, color: "#d9ef8b", label: "Moderate vegetation" },
+        { min: 0.20, max: 0.30, color: "#fee08b", label: "Sparse vegetation" },
+        { min: 0.10, max: 0.20, color: "#fdae61", label: "Bare soil" },
+        { min: 0.00, max: 0.10, color: "#f46d43", label: "Bare soil" },
+        { min: -0.20, max: 0.00, color: "#d73027", label: "Water/Urban/Cloud" }
+    ];
+
+    const EVI_LEGEND = [
+        { min: 0.60, max: 0.80, color: "#440154", label: "Dense vegetation" },
+        { min: 0.40, max: 0.60, color: "#31688e", label: "Moderate vegetation" },
+        { min: 0.20, max: 0.40, color: "#35b779", label: "Sparse vegetation" },
+        { min: 0.00, max: 0.20, color: "#fde725", label: "Bare soil" },
+        { min: -0.20, max: 0.00, color: "#f9f871", label: "Water/Urban/Cloud" }
+    ];
+
+    const NDRE_LEGEND = [
+        { min: 0.25, max: 0.30, color: "#f0f921", label: "Dense vegetation" },
+        { min: 0.20, max: 0.25, color: "#f89540", label: "Moderate vegetation" },
+        { min: 0.15, max: 0.20, color: "#cc4778", label: "Sparse vegetation" },
+        { min: 0.05, max: 0.15, color: "#7201a8", label: "Bare soil/Other" }
+    ];
+
+    const NDMI_LEGEND = [
+        { min: 0.20, max: 0.30, color: "#01665e", label: "Very moist" },
+        { min: 0.10, max: 0.20, color: "#35978f", label: "Moist" },
+        { min: 0.00, max: 0.10, color: "#80cdc1", label: "Slightly moist" },
+        { min: -0.10, max: 0.00, color: "#dfc27d", label: "Dry" },
+        { min: -0.20, max: -0.10, color: "#a6611a", label: "Very dry" }
+    ];
+
+    const NDWI_LEGEND = [
+        { min: 0.20, max: 0.30, color: "#313695", label: "Open water" },
+        { min: 0.10, max: 0.20, color: "#4575b4", label: "Wetland" },
+        { min: 0.00, max: 0.10, color: "#74add1", label: "Moist soil" },
+        { min: -0.10, max: 0.00, color: "#fdae61", label: "Dry soil" },
+        { min: -0.30, max: -0.10, color: "#d73027", label: "Bare soil/Urban" }
+    ];
+
+    const VegetationLegend = ({ indexType }) => {
+        // Select the appropriate legend based on the index type
+        const getLegend = () => {
+            switch (indexType.toLowerCase()) {
+                case 'ndvi':
+                    return NDVI_LEGEND;
+                case 'evi':
+                    return EVI_LEGEND;
+                case 'ndre':
+                    return NDRE_LEGEND;
+                case 'ndmi':
+                    return NDMI_LEGEND;
+                case 'ndwi':
+                    return NDWI_LEGEND;
+                default:
+                    return NDVI_LEGEND;
+            }
+        };
+
+        const legend = getLegend();
+
+        // Update the VegetationLegend component styling:
+        return (
+            <div className="absolute z-50 bottom-1 left-1 bg-white p-4 py-3 rounded-lg shadow-lg">
+                <h4 className="mb-2 text-black text-sm font-semibold">{indexType.toUpperCase()} Legend</h4>
+                {legend.map((item, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                        <div className="w-5 h-5 mr-2" style={{ backgroundColor: item.color }}></div>
+                        <span className="text-xs text-black">{item.min.toFixed(2)} - {item.max.toFixed(2)}: {item.label}</span>
+                    </div>
+                ))}
+            </div>
+        );
+    };
 
     const fetchLocationName = async (latitude, longitude) => {
         try {
@@ -462,7 +542,7 @@ export default function GIS() {
                     {/* Left: Map + Tabs */}
                     <div className="flex flex-col  flex-1  rounded-lg overflow-hidden">
                         {/* Map (fixed height) */}
-                        <div className="h-[400px]">
+                        <div className="h-[500px]">
                             <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY} libraries={["drawing"]}>
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
@@ -529,42 +609,24 @@ export default function GIS() {
                                             </React.Fragment>
                                         );
                                     })}
-                                    <div className="absolute bottom-4 left-4 bg-white p-2 rounded shadow">
-                                        <h4 className="font-bold text-black mb-2">Vegetation Indexes</h4>
-                                        <div className="flex flex-col space-y-2">
-                                            <div className="flex items-center">
-                                                <div className="w-20 h-4 bg-gradient-to-r from-blue-300 via-cyan-400 to-blue-600"></div>
-                                                <span className="ml-2 text-xs text-black">NDWI (Normalized Difference Water Index)</span>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <div className="w-20 h-4 bg-gradient-to-r from-cyan-400 via-cyan-600 to-cyan-900"></div>
-                                                <span className="ml-2 text-xs text-black">EVI (Enhanced Vegetation Index)</span>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <div className="w-20 h-4 bg-gradient-to-r from-red-300 via-red-500 to-red-700"></div>
-                                                <span className="ml-2 text-xs text-black">NDRE (Normalized Difference Red Edge)</span>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <div className="w-20 h-4 bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-500"></div>
-                                                <span className="ml-2 text-xs text-black">NDMI (Normalized Difference Moisture Index)</span>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <div className="w-20 h-4 bg-gradient-to-r from-lime-100 via-lime-300 to-lime-500"></div>
-                                                <span className="ml-2 text-xs text-black">NDVI (Normalized Difference Vegetation Index)</span>
-                                            </div>
+                                    {/* Add this near your map component */}
+                                    {(selectedPolygonData || selectedVegetationIndex) && (
+                                        <div>
+                                            <h1>{indexType}</h1>
+                                            <VegetationLegend indexType={indexType || selectedPolygonData.indexType} />
                                         </div>
-                                    </div>
+                                    )}
                                 </GoogleMap>
                             </LoadScript>
                         </div>
                         {/* Add this button somewhere in your UI */}
                         <button
                             onClick={toggleDrawingMode}
-                            className={`px-4 py-2 absolute right-[22rem] top-[26rem] rounded ${drawingMode ? 'bg-red-500' : 'bg-green-500'}`}
+                            className={`px-4 py-2 absolute right-[38rem] top-[32.6rem] rounded ${drawingMode ? 'bg-red-500' : 'bg-green-500'}`}
                         >
                             {drawingMode ? 'Cancel Drawing' : 'Draw Polygon'}
                         </button>
-                        <div className="flex absolute right-[31rem] top-[26rem] gap-4 bg-gray-900 p-1.5 rounded-lg text-white w-max select-none">
+                        <div className="flex absolute right-[22rem] top-[32.5rem] gap-4 bg-gray-900 p-1.5 rounded-lg text-white w-max select-none">
                             {/* Sentinel-2 toggle */}
                             <div className="relative">
                                 <button
@@ -597,8 +659,7 @@ export default function GIS() {
                             <div className="relative">
                                 <button
                                     onClick={toggleNdvi}
-                                    className={`min-w-[100px] px-4 py-1 rounded-md focus:outline-none
-            ${ndviOpen ? 'bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
+                                    className={`min-w-[100px] px-4 py-1 rounded-md focus:outline-none ${ndviOpen ? 'bg-blue-700' : 'bg-gray-800 hover:bg-gray-700'}`}
                                 >
                                     {indexType.toUpperCase()} {ndviOpen ? '▲' : '▼'}
                                 </button>
@@ -606,31 +667,31 @@ export default function GIS() {
                                 {ndviOpen && (
                                     <div className="absolute top-full left-0 mt-2 w-36 bg-gray-800 rounded-md shadow-lg p-3 z-20 flex flex-col">
                                         <button
-                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndwi' ? 'bg-blue-700' : ''}`}
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1  ${indexType === 'ndwi' ? 'bg-blue-700 px-2' : ''}`}
                                             onClick={() => setIndexType('ndwi')}
                                         >
                                             NDWI
                                         </button>
                                         <button
-                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'evi' ? 'bg-blue-700' : ''}`}
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'evi' ? 'bg-blue-700 px-2' : ''}`}
                                             onClick={() => setIndexType('evi')}
                                         >
                                             EVI
                                         </button>
                                         <button
-                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndre' ? 'bg-blue-700' : ''}`}
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndre' ? 'bg-blue-700 px-2' : ''}`}
                                             onClick={() => setIndexType('ndre')}
                                         >
                                             NDRE
                                         </button>
                                         <button
-                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndmi' ? 'bg-blue-700' : ''}`}
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndmi' ? 'bg-blue-700 px-2' : ''}`}
                                             onClick={() => setIndexType('ndmi')}
                                         >
                                             NDMI
                                         </button>
                                         <button
-                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndvi' ? 'bg-blue-700' : ''}`}
+                                            className={`text-left py-1 hover:bg-gray-700 rounded-md mt-1 ${indexType === 'ndvi' ? 'bg-blue-700 px-2' : ''}`}
                                             onClick={() => setIndexType('ndvi')}
                                         >
                                             NDVI
@@ -641,14 +702,10 @@ export default function GIS() {
                         </div>
                         {/* Start Date Selector */}
                         <div className="flex items-center justify-between p-1 px-2 bg-teal-800 text-white rounded-b-xl">
-                            <div className="flex justify-start ">
-                                <button className="bg-teal-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
-                                    Show historical images
-                                </button>
-                            </div>
+                            
 
-                            <div className="flex space-x-3 overflow-x-auto">
-                                {['27 May', '28 May', '29 May', '30 May', '31 May', '01 Jun'].map((date) => (
+                            <div className="flex justify-between w-full overflow-x-auto">
+                                {['23 May','24 May','25 May','26 May','27 May', '28 May', '29 May', '30 May', '31 May', '01 Jun'].map((date) => (
                                     <button
                                         key={date}
                                         className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-green-500"
@@ -659,11 +716,7 @@ export default function GIS() {
                                 ))}
                             </div>
 
-                            <div className="flex justify-end ">
-                                <button className="bg-teal-700 text-white px-5 py-2 rounded-md text-sm hover:bg-green-600">
-                                    Next image <span className="ml-2">May 18, 2025</span>
-                                </button>
-                            </div>
+                        
                         </div>
 
 
@@ -1087,7 +1140,7 @@ export default function GIS() {
 
                             {/* Season Box */}
                             <div className="bg-teal-700 p-3 rounded-md mb-4 text-sm font-semibold text-white">
-                                📅 Season 2025
+                                Season 2025
                             </div>
 
                             {/* Menu List */}
@@ -1097,10 +1150,10 @@ export default function GIS() {
                                 {/* Monitoring Toggle */}
                                 <div>
                                     <div
-                                        className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
+                                        className="px-2 cursor-pointer font-bold hover:text-blue-400 flex justify-between items-center"
                                         onClick={() => toggle(setMonitoringOpen)}
                                     >
-                                        📦 Monitoring
+                                        Monitoring
                                         <span>{monitoringOpen ? '▾' : '▸'}</span>
                                     </div>
                                     {monitoringOpen && (
@@ -1112,16 +1165,16 @@ export default function GIS() {
                                     )}
                                 </div>
                                 <div>
-                                    <button className="px-2" onClick={() => setModalOpen(true)}> ⚛️ Open Connect Modal</button>
+                                    <button className="px-2 font-bold hover:text-blue-400" onClick={() => setModalOpen(true)}> Open Connect Modal</button>
                                     <ConnectStationsModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
                                 </div>
                                 {/* Weather */}
                                 <div>
                                     <div
-                                        className="px-2 cursor-pointer hover:text-blue-400 flex justify-between items-center"
+                                        className="px-2 cursor-pointer font-bold hover:text-blue-400 flex justify-between items-center"
                                         onClick={() => setIsWeatherOpen(true)}
                                     >
-                                        ☁️ Weather
+                                        Weather
                                         <span>{weatherOpen ? "▾" : "▸"}</span>
                                     </div>
 
@@ -1177,7 +1230,7 @@ export default function GIS() {
                                 onClick={() => setModalOpenValidation(true)}
                                 className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl"
                             >
-                                ✅ Insurance validation
+                                Insurance validation
                             </button>
 
 
@@ -1187,9 +1240,8 @@ export default function GIS() {
                             >
                                 {chatOpen ? 'Close AI assistant' : 'Start AI assistant'}
                             </button>
-                            <div>🔔 Notifications</div>
+                            {/* <div> Notifications</div>
 
-                            {/* Help Center */}
                             <div>
                                 <div
                                     className="cursor-pointer hover:text-blue-400 flex justify-between items-center"
@@ -1199,13 +1251,8 @@ export default function GIS() {
                                     <span>{helpOpen ? '▾' : '▸'}</span>
                                 </div>
                                 {helpOpen && <div className="ml-6 mt-1">Coming soon...</div>}
-                            </div>
+                            </div> */}
 
-                            {/* User Section */}
-                            <div className="pt-3 border-t border-gray-700 mt-3">
-                                <div>👤 Alok kumar Yadav</div>
-                                <div className="text-xs text-gray-400">Team Alok kumar...</div>
-                            </div>
 
                             {/* CTA Buttons */}
                             <div className="pt-4 space-y-2">

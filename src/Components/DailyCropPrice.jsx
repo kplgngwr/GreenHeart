@@ -62,7 +62,7 @@ const DailyCropPrice = () => {
   return (
     <div>
       <button 
-        className="px-2 py-1  text-white rounded-md hover:bg-green-800 focus:outline-none "
+        className="px-2 py-1 font-bold text-sm hover:text-blue-400 text-gray-300 rounded-md focus:outline-none "
         onClick={handleOpen}
       >
         View Daily Crop Prices

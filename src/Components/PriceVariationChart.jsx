@@ -320,7 +320,6 @@ export function PriceVariationChart() {
   // ── 8) Fetch price data when user clicks “Search Price Data” ──────────────
   const fetchPriceData = async () => {
     if (last30Dates.length === 0 || !market) return
-
     setLoading(true)
     setError(null)
 
@@ -384,7 +383,7 @@ export function PriceVariationChart() {
   // ── 9) JSX ─────────────────────────────────────────────────────────────────
   return (
     <div className="max-w-7xl  p-4 bg-teal-800 rounded-xl mt-4 shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-white">Crop Price Variation (₹/100 kg)</h2>
+      <h2 className="text-2xl font-bold mb-4 text-white">Crop Past Prices In Various Market (₹/100 kg)</h2>
 
       {/* Location status message */}
       {/* {locationStatus !== 'idle' && (
@@ -530,19 +529,24 @@ export function PriceVariationChart() {
               data={chartData}
               margin={{ top: 5, right: 30, left: 20, bottom: 15 }}
             >
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="white" />
               <XAxis
                 dataKey="date"
-                tick={{ fontSize: 10 }}
+                tick={{ fontSize: 14, fill: 'white' }}
                 interval={2}
-                label={{ value: 'Date', position: 'bottom', offset: 0 }}
+                tickLine={{ stroke: 'white' }}
+                axisLine={{ stroke: 'white' }}
+                label={{ value: 'Date', position: 'bottom', offset: 0, fill: 'white' }}
               />
               <YAxis
+                tick={{ fontSize: 14, fill: 'white' }}
+                axisLine={{ stroke: 'white' }}
                 label={{
                   value: 'Price (₹)/100 KG',
                   angle: -90,
                   position: 'insideLeft',
-                  offset: 5,
+                  offset: 0,
+                  fill: 'white'
                 }}
               />
               <Tooltip
@@ -560,7 +564,7 @@ export function PriceVariationChart() {
                   <text
                     x={x}
                     y={y - 20}
-                    fill="#3b82f6"
+                    fill="white"
                     fontSize={10}
                     textAnchor="middle"
                   >
