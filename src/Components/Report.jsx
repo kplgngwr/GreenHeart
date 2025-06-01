@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 // Initialize Gemini AI
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 
@@ -1114,6 +1115,68 @@ export function Report() {
     }));
   };
 
+  // Add this function inside the Report component
+  const handleDownloadPDF = () => {
+    const reportElement = document.getElementById("report-content");
+    if (!reportElement) return;
+
+    const tempStyle = document.createElement("style");
+    tempStyle.innerHTML = `
+      * {
+        color-scheme: light only !important;
+        color: rgb(0, 0, 0) !important;
+        background-color: rgb(255, 255, 255) !important;
+        border-color: rgb(0, 0, 0) !important;
+      }
+      .bg-green-500 { background-color: rgb(34, 197, 94) !important; }
+      .bg-orange-500 { background-color: rgb(249, 115, 22) !important; }
+      .bg-blue-500 { background-color: rgb(59, 130, 246) !important; }
+      .bg-purple-500 { background-color: rgb(168, 85, 247) !important; }
+      .text-green-700 { color: rgb(21, 128, 61) !important; }
+      .text-gray-700 { color: rgb(55, 65, 81) !important; }
+      .text-gray-900 { color: rgb(17, 24, 39) !important; }
+      .bg-gray-200 { background-color: rgb(229, 231, 235) !important; }
+    `;
+    document.head.appendChild(tempStyle);
+
+    html2canvas(reportElement, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      removeContainer: true,
+      backgroundColor: "#ffffff",
+    }).then((canvas) => {
+      document.head.removeChild(tempStyle);
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const margin = 10; // 10mm margin
+      const imgWidth = pageWidth - (2 * margin);
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = margin;
+
+      pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - (2 * margin));
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight + margin;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - (2 * margin));
+      }
+
+      pdf.save(`Farm-Report-${formData.farmLocation}.pdf`);
+    });
+  };
+
   const handleGenerate = async () => {
     setLoading(true);
     setError(null);
@@ -1153,7 +1216,8 @@ export function Report() {
       }
 
       const completeHTML = `
-  <div>
+  <div id="report-content"  className="m-8 p-6 bg-white rounded-lg shadow-md"
+  dangerouslySetInnerHTML={{ __html: reportHTML }} >
       <h2 class="text-2xl font-bold text-green-700 mb-4">${
         languageTemplates[language].cropSuitability
       }</h2>
@@ -1166,25 +1230,38 @@ export function Report() {
   <div class="flex items-center">
      <span class="w-32 font-medium text-gray-700">Nitrogen:</span>
      <div class="flex-1 bg-gray-200 h-3 rounded-full mx-4 ">
-       <div class="bg-green-500 h-3 rounded-full" style="width: ${Math.min(formData.nitrogen, 100)}%;"></div>
+       <div class="bg-green-500 h-3 rounded-full" style="width: ${Math.min(
+         formData.nitrogen,
+         100
+       )}%;"></div>
      </div>
-     <span class="w-18 flex text-right text-gray-900">${formData.nitrogen}mg/kg</span>
+     <span class="w-18 flex text-right text-gray-900">${
+       formData.nitrogen
+     }mg/kg</span>
    </div>
 
    <!-- Phosphorus -->
    <div class="flex items-center">
      <span class="w-32 font-medium text-gray-700">Phosphorus:</span>
      <div class="flex-1 bg-gray-200 h-3 rounded-full mx-4 ">
-       <div class="bg-orange-500 h-3 rounded-full" style="width: ${Math.min(formData.phosphorus, 100)}%;"></div>
+       <div class="bg-orange-500 h-3 rounded-full" style="width: ${Math.min(
+         formData.phosphorus,
+         100
+       )}%;"></div>
      </div>
-     <span class="w-18 flex  text-right text-gray-900">${formData.phosphorus}mg/kg</span>
+     <span class="w-18 flex  text-right text-gray-900">${
+       formData.phosphorus
+     }mg/kg</span>
    </div>
 
    <!-- pH Level -->
    <div class="flex items-center">
      <span class="w-32 font-medium text-gray-700">pH Level:</span>
      <div class="flex-1 bg-gray-200 h-3 rounded-full mx-4 w-96 ">
-       <div class="bg-blue-500 h-3 rounded-full" style="width: ${Math.min((formData.ph / 14) * 100, 100)}%;"></div>
+       <div class="bg-blue-500 h-3 rounded-full" style="width: ${Math.min(
+         (formData.ph / 14) * 100,
+         100
+       )}%;"></div>
      </div>
      <span class="w-12 text-right text-gray-900">${formData.ph}</span>
    </div>
@@ -1193,7 +1270,10 @@ export function Report() {
    <div class="flex items-center">
      <span class="w-32 font-medium text-gray-700">Organic Matter:</span>
      <div class="flex-1 bg-gray-200 h-3 rounded-full mx-4 w-96">
-       <div class="bg-purple-500 h-3 rounded-full" style="width: ${Math.min(formData.organicMatter * 20, 100)}%;"></div>
+       <div class="bg-purple-500 h-3 rounded-full" style="width: ${Math.min(
+         formData.organicMatter * 20,
+         100
+       )}%;"></div>
      </div>
      <span class="w-12 text-right text-gray-900">${
        formData.organicMatter
@@ -1447,6 +1527,13 @@ export function Report() {
             {loading ? "Generating..." : "Generate Report"}
           </button>
         </div>
+        <button
+          onClick={handleDownloadPDF}
+          disabled={!reportHTML || loading}
+          className="ml-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          Download PDF
+        </button>
 
         {/* Error Message */}
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
