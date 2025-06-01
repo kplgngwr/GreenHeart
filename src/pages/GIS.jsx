@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { getAllLandData } from "../context/firebase";
-import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, DrawingManager, Polygon, GroundOverlay, } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker, DirectionsRenderer, Circle, DrawingManager, Polygon, GroundOverlay, StandaloneSearchBox, } from '@react-google-maps/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import axios from "axios";
 import Weather from "../Components/Weather";
@@ -115,6 +115,7 @@ export default function GIS() {
     const mapRef = useRef(null);
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [currentLocation, setCurrentLocation] = useState({ lat: 30.762357, lng: 76.598619 }); // Default fallback
+    const searchBoxRef = useRef(null); 
     // Add a useEffect to get the user's location when component mounts
     useEffect(() => {
         const requestLocationAccess = async () => {
@@ -543,7 +544,7 @@ export default function GIS() {
                     <div className="flex flex-col  flex-1  rounded-lg overflow-hidden">
                         {/* Map (fixed height) */}
                         <div className="h-[500px]">
-                            <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY} libraries={["drawing"]}>
+                            <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_KEY} libraries={["drawing", "places"]}>
                                 <GoogleMap
                                     mapContainerStyle={containerStyle}
                                     center={currentLocation}
@@ -551,6 +552,44 @@ export default function GIS() {
                                     onLoad={handleMapLoad}
                                     mapTypeId="hybrid"
                                 >
+                                    <StandaloneSearchBox
+                                        onLoad={ref => searchBoxRef.current = ref}
+                                        onPlacesChanged={() => {
+                                            const places = searchBoxRef.current.getPlaces();
+                                            if (places.length > 0) {
+                                                const place = places[0];
+                                                const newLocation = {
+                                                    lat: place.geometry.location.lat(),
+                                                    lng: place.geometry.location.lng()
+                                                };
+                                                setCurrentLocation(newLocation);
+                                                mapRef.current.panTo(newLocation);
+                                            }
+                                        }}
+                                    >
+                                        <input
+                                            type="text"
+                                            placeholder="Search locations"
+                                            style={{
+                                                boxSizing: `border-box`,
+                                                border: `1px solid bg-gray-200`,
+                                                backgroundColor: `grey`,
+                                                width: `240px`,
+                                                height: `32px`,
+                                                padding: `0 12px`,
+                                                borderRadius: `3px`,
+                                                boxShadow: `0 2px 6px rgba(0, 0, 0, 0.3)`,
+                                                fontSize: `14px`,
+                                                outline: `none`,
+                                                textOverflow: `ellipses`,
+                                                position: "absolute",
+                                                left: "50%",
+                                                marginLeft: "-120px",
+                                                marginTop:'8px',
+                                                color:"white",
+                                            }}
+                                        />
+                                    </StandaloneSearchBox>
                                     {mapLoaded && (
                                         <DrawingManager
                                             onLoad={(drawingManager) => {
