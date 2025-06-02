@@ -535,7 +535,7 @@ export default function GIS() {
 
         // listen for click to re-select, if you need
         polygon.addListener("click", () => {
-            /* optional selection logic */
+            setSelectedPolygon(id);
         });
 
         // store
@@ -960,7 +960,7 @@ export default function GIS() {
                                                 </div>
                                                 <div className="mt-2 w-full " >
                                                     <a
-                                                        className="bg-green-600 hover:bg-green-700 px-20 py-3 text-white rounded w-[200%] mt-4"
+                                                        className="bg-green-600 hover:bg-green-700 px-10 py-3 text-white rounded w-[200%] mt-4"
                                                         href="/report"
                                                     >
                                                         Generate Report
