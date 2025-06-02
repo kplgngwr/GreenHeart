@@ -879,12 +879,12 @@ export default function GIS() {
                                                     />
                                                 </div>
 
-                                                <button
+                                                <a
                                                     className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
-                                                    onClick={() => setIsModalOpen(true)}
+                                                    href="/report"
                                                 >
                                                     Generate Report
-                                                </button>
+                                                </a>
                                                 {/* Buttons Section */}
                                                 <div className="flex gap-4 mt-4">
                                                     <button
