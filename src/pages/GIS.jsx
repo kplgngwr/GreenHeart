@@ -536,6 +536,7 @@ export default function GIS() {
         // listen for click to re-select, if you need
         polygon.addListener("click", () => {
             setSelectedPolygon(id);
+            // polygon.setOptions({ fillColor: '#FFFF00', fillOpacity: 0.5 });
         });
 
         // store
@@ -683,11 +684,13 @@ export default function GIS() {
                                             <React.Fragment key={id}>
                                                 <Polygon
                                                     paths={path}
+                                                    key={id}
                                                     options={{
                                                         fillOpacity: 0,
                                                         strokeColor: "#FF4500",
                                                         strokeWeight: 2,
                                                     }}
+                                                    onClick={() => setSelectedPolygon(id)}
                                                 />
                                                 <SvgMaskedOverlay
                                                     map={mapRef.current}
