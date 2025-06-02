@@ -1058,7 +1058,7 @@ const sampleUserInputs = [
     potassium: 175,
     ph: 6.5,
     organicMatter: 1.8,
-    soilType: "Black Cotton",
+    soilType: "Black Soil",
     irrigationType: "Drip",
     language: "mr",
   },
