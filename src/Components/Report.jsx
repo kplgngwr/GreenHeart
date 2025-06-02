@@ -1520,20 +1520,20 @@ export function Report() {
           <button
             onClick={handleGenerate}
             disabled={loading}
-            className={`bg-green-500 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg focus:ring-2 focus:ring-green-400 transition ${
+            className={`bg-green-600 hover:bg-green-600 text-white font-semibold px-6 py-3 rounded-lg focus:ring-2 focus:ring-green-400 transition ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {loading ? "Generating..." : "Generate Report"}
           </button>
-        </div>
         <button
           onClick={handleDownloadPDF}
           disabled={!reportHTML || loading}
-          className="ml-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
+          className="ml-2 px-4 py-2 font-bold bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
           Download PDF
         </button>
+          </div>
 
         {/* Error Message */}
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}

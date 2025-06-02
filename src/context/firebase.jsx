@@ -57,7 +57,7 @@ export async function getAllLandData() {
   const dbReference = dbRef(database);
   const snapshot = await get(child(dbReference, "devices"));
   if (snapshot.exists()) {
-    console.log(snapshot.val())
+    // console.log(snapshot.val())
     return snapshot.val();
   } else {
     console.log("No data available");
@@ -76,7 +76,7 @@ export async function getAllProfilesData() {
       id: doc.id,
       ...doc.data(),
     }));
-    console.log(profilesData)
+    // console.log(profilesData)
     return profilesData;
   } catch (error) {
     console.error("Error fetching profiles data:", error);
