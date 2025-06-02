@@ -41,7 +41,57 @@ export default function GIS() {
     const [modalOpen, setModalOpen] = useState(false);
     // Add new state variables for polygon selection and crop allocation
     const [selectedPolygon, setSelectedPolygon] = useState(null);
-    const [cropOptions, setCropOptions] = useState(['Wheat', 'Rice', 'Corn', 'Soybean', 'Cotton']);
+    const [cropOptions, setCropOptions] = useState([
+        'Rice (Paddy)',
+        'Wheat',
+        'Maize',
+        'Sorghum (Jowar)',
+        'Pearl Millet (Bajra)',
+        'Finger Millet (Ragi)',
+        'Barley',
+        'Chickpea (Gram)',
+        'Pigeon Pea (Arhar / Toor)',
+        'Green Gram (Moong Bean)',
+        'Black Gram (Urad Bean)',
+        'Lentil (Masoor)',
+        'Groundnut (Peanut)',
+        'Rapeseed & Mustard',
+        'Soybean',
+        'Sunflower',
+        'Sesame (Til)',
+        'Sugarcane',
+        'Cotton',
+        'Jute',
+        'Potato',
+        'Onion',
+        'Tomato',
+        'Brinjal (Eggplant)',
+        'Chilli',
+        'Cabbage',
+        'Cauliflower',
+        'Okra (Ladyfinger / Bhindi)',
+        'Mango',
+        'Banana',
+        'Tea',
+        'Coffee',
+        'Rubber',
+        'Tobacco',
+        'Kidney Bean (Rajma)',
+        'Peas (Field/Green)',
+        'Castor',
+        'Linseed (Flaxseed)',
+        'Niger Seed',
+        'Sweet Potato',
+        'Coriander (for seed)',
+        'Cumin',
+        'Turmeric',
+        'Ginger',
+        'Garlic',
+        'Cucurbits (e.g., Bottle Gourd, Bitter Gourd)',
+        'Guava',
+        'Papaya',
+        'Citrus (Oranges/Lemons)'
+      ]);
     const cropColors = {
         "Wheat": "#F5DEB3",  // Wheat color
         "Rice": "#90EE90",   // Light green
@@ -196,11 +246,11 @@ export default function GIS() {
     ];
 
     const NDWI_LEGEND = [
-        { min: 0.20, max: 0.30, color: "#313695", label: "Open water" },
-        { min: 0.10, max: 0.20, color: "#4575b4", label: "Wetland" },
+        { min: 0.20, max: 0.30, color: "#313695", label: "Bare soil/Urban" },
+        { min: 0.10, max: 0.20, color: "#4575b4", label: "Dry soil" },
         { min: 0.00, max: 0.10, color: "#74add1", label: "Moist soil" },
-        { min: -0.10, max: 0.00, color: "#fdae61", label: "Dry soil" },
-        { min: -0.30, max: -0.10, color: "#d73027", label: "Bare soil/Urban" }
+        { min: -0.10, max: 0.00, color: "#fdae61", label: "Wetland" },
+        { min: -0.30, max: -0.10, color: "#d73027", label: "Open water" }
     ];
 
     const VegetationLegend = ({ indexType }) => {
@@ -682,11 +732,23 @@ export default function GIS() {
                                             <span>Sentinel-2 S2 <span className="text-sm text-gray-400">(10m)</span></span>
                                         </label>
                                         <label className="flex items-center space-x-2 mb-2 cursor-pointer">
-                                            <input type="checkbox" defaultChecked className="form-checkbox text-blue-500" />
+                                            <input type="checkbox"  className="form-checkbox text-blue-500" />
+                                            <span>Sentinel-1 <span className="text-sm text-gray-400">(10m)</span></span>
+                                        </label>
+                                        <label className="flex items-center space-x-2 mb-2 cursor-pointer">
+                                            <input type="checkbox"  className="form-checkbox text-blue-500" />
+                                            <span>SMAP <span className="text-sm text-gray-400">(10m)</span></span>
+                                        </label>
+                                        <label className="flex items-center space-x-2 mb-2 cursor-pointer">
+                                            <input type="checkbox"  className="form-checkbox text-blue-500" />
+                                            <span>SRTM DEM(Provide elevation) <span className="text-sm text-gray-400">(10m)</span></span>
+                                        </label>
+                                        <label className="flex items-center space-x-2 mb-2 cursor-pointer">
+                                            <input type="checkbox"  className="form-checkbox text-blue-500" />
                                             <span>My Crops</span>
                                         </label>
                                         <label className="flex items-center space-x-2 mb-2 cursor-pointer">
-                                            <input type="checkbox" defaultChecked className="form-checkbox text-blue-500" />
+                                            <input type="checkbox"  className="form-checkbox text-blue-500" />
                                             <span>Crop Classification</span>
                                         </label>
                                         {/* Add more satellite options here */}
