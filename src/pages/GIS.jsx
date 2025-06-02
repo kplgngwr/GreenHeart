@@ -115,7 +115,7 @@ export default function GIS() {
     const mapRef = useRef(null);
     const [geoJsonData, setGeoJsonData] = useState(null);
     const [currentLocation, setCurrentLocation] = useState({ lat: 30.762357, lng: 76.598619 }); // Default fallback
-    const searchBoxRef = useRef(null); 
+    const searchBoxRef = useRef(null);
     // Add a useEffect to get the user's location when component mounts
     useEffect(() => {
         const requestLocationAccess = async () => {
@@ -585,8 +585,8 @@ export default function GIS() {
                                                 position: "absolute",
                                                 left: "50%",
                                                 marginLeft: "-120px",
-                                                marginTop:'8px',
-                                                color:"white",
+                                                marginTop: '8px',
+                                                color: "white",
                                             }}
                                         />
                                     </StandaloneSearchBox>
@@ -741,10 +741,10 @@ export default function GIS() {
                         </div>
                         {/* Start Date Selector */}
                         <div className="flex items-center justify-between p-1 px-2 bg-teal-800 text-white rounded-b-xl">
-                            
+
 
                             <div className="flex justify-between w-full overflow-x-auto">
-                                {['23 May','24 May','25 May','26 May','27 May', '28 May', '29 May', '30 May', '31 May', '01 Jun'].map((date) => (
+                                {['23 May', '24 May', '25 May', '26 May', '27 May', '28 May', '29 May', '30 May', '31 May', '01 Jun'].map((date) => (
                                     <button
                                         key={date}
                                         className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm hover:bg-green-500"
@@ -755,7 +755,7 @@ export default function GIS() {
                                 ))}
                             </div>
 
-                        
+
                         </div>
 
 
@@ -878,29 +878,31 @@ export default function GIS() {
                                                         disabled
                                                     />
                                                 </div>
-
-                                                <a
-                                                    className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
-                                                    href="/report"
-                                                >
-                                                    Generate Report
-                                                </a>
+                                               
                                                 {/* Buttons Section */}
-                                                <div className="flex gap-4 mt-4">
+                                                <div className="flex gap-4 my-4 ">
                                                     <button
                                                         onClick={allocateCrop}
                                                         disabled={!selectedCrop}
-                                                        className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
+                                                        className="bg-green-600 hover:bg-green-700 px-6 py-3 text-white rounded w-full "
                                                     >
                                                         Allocate Crop
                                                     </button>
                                                     <button
                                                         onClick={deallocateCrop}
                                                         disabled={!polygonCrops[selectedPolygon]}
-                                                        className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded w-full disabled:opacity-50"
+                                                        className="bg-red-600 hover:bg-red-700 px-6 py-3 text-white rounded w-full "
                                                     >
                                                         Deallocate Crop
                                                     </button>
+                                                </div>
+                                                <div className="mt-2 w-full " >
+                                                    <a
+                                                        className="bg-green-600 hover:bg-green-700 px-26.5 py-3 text-white rounded w-[200%] mt-4"
+                                                        href="/report"
+                                                    >
+                                                        Generate Report
+                                                    </a>
                                                 </div>
                                             </div>
 
