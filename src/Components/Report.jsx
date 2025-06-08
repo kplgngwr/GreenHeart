@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
@@ -1051,7 +1051,7 @@ function getYieldHeaders(language) {
 
 const sampleUserInputs = [
   {
-    farmLocation: "Nagpur, Maharashtra",
+    farmLocation: "Fetching location...", // This will be updated with real location
     farmSize: 5.2,
     nitrogen: 65,
     phosphorus: 28,
@@ -1059,37 +1059,47 @@ const sampleUserInputs = [
     ph: 6.5,
     organicMatter: 1.8,
     soilType: "Black Soil",
-    irrigationType: "Drip",
+    irrigationType: "Drip irrigation",
     language: "mr",
-  },
-  {
-    farmLocation: "Amritsar, Punjab",
-    farmSize: 8.5,
-    nitrogen: 72,
-    phosphorus: 35,
-    potassium: 190,
-    ph: 7.2,
-    organicMatter: 2.1,
-    soilType: "Alluvial",
-    irrigationType: "Tube Well",
-    language: "pa",
-  },
-  {
-    farmLocation: "Coimbatore, Tamil Nadu",
-    farmSize: 3.8,
-    nitrogen: 58,
-    phosphorus: 22,
-    potassium: 165,
-    ph: 6.8,
-    organicMatter: 1.5,
-    soilType: "Red",
-    irrigationType: "Canal",
-    language: "ta",
   },
 ];
 
 // React Page: Report.jsx
 export function Report() {
+
+  const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation is not supported by your browser"));
+        return;
+      }
+      
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            // Use reverse geocoding to get the location name
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`
+            );
+            const data = await response.json();
+            
+            // Extract city and state from the address
+            const address = data.address;
+            const city = address.city || address.town || address.village || address.hamlet || "";
+            const state = address.state || "";
+            
+            resolve(`${city}, ${state}`);
+          } catch (error) {
+            reject(new Error("Failed to get location name"));
+          }
+        },
+        (error) => {
+          reject(new Error(`Failed to get location: ${error.message}`));
+        }
+      );
+    });
+  };
   const [formData, setFormData] = useState({
     farmLocation: sampleUserInputs[0].farmLocation,
     farmSize: sampleUserInputs[0].farmSize,
@@ -1103,6 +1113,23 @@ export function Report() {
     language: sampleUserInputs[0].language,
   });
 
+  // Add useEffect to fetch location when component mounts
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const location = await getCurrentLocation();
+        setFormData(prev => ({
+          ...prev,
+          farmLocation: location
+        }));
+      } catch (error) {
+        console.error("Error getting location:", error);
+        // Keep the default location if there's an error
+      }
+    };
+    
+    fetchLocation();
+  }, []);
   const [reportHTML, setReportHTML] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
