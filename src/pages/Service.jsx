@@ -76,28 +76,28 @@ function ServiceOverview() {
                 </div>
               </div>
 
-              {/* 2. Smart Soil Card */}
+              {/* 2. GIS Services Card */}
               <div className="group rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 bg-white hover:scale-105 border border-gray-100">
                 <div className="h-40 overflow-hidden bg-gradient-to-r from-green-500 to-emerald-400">
                   <img src="/smart-soil.jpg" alt="Smart Soil Management" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3 text-green-700">Smart Soil & Water Management</h3>
+                  <h3 className="text-xl font-bold mb-3 text-emerald-700">GIS Mapping & Analysis</h3>
                   <ul className="space-y-2 mb-4 text-gray-600">
                     <li className="flex items-start">
-                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
-                      <span><strong>Soil Testing & Analysis</strong>: Mobile lab services for on-site testing</span>
+                      <span><strong>Spatial Data Collection</strong>: Advanced mapping techniques for precise data</span>
                     </li>
                     <li className="flex items-start">
-                      <svg className="h-5 w-5 text-green-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-blue-500 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                       </svg>
-                      <span><strong>IoT-Based Water Management</strong>: Optimize water usage with smart sensors</span>
+                      <span><strong>Geospatial Analysis</strong>: In-depth analysis for better decision making</span>
                     </li>
                   </ul>
-                  <a href="/services/soil-management" className="inline-block px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-400 text-white rounded-full text-sm font-medium hover:from-green-600 hover:to-emerald-500 transition-all duration-300">
+                  <a href="/gis" className="inline-block px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-400 text-white rounded-full text-sm font-medium hover:from-green-600 hover:to-emerald-500 transition-all duration-300">
                     Learn More
                   </a>
                 </div>
@@ -178,7 +178,7 @@ function ServiceOverview() {
                       <span><strong>Real-Time Price Tracking</strong>: Fair market rates</span>
                     </li>
                   </ul>
-                  <a href="/marketplace" className="inline-block px-4 py-2 bg-gradient-to-r from-cyan-500 to-green-400 text-white rounded-full text-sm font-medium hover:from-cyan-600 hover:to-green-500 transition-all duration-300">
+                  <a href="/market" className="inline-block px-4 py-2 bg-gradient-to-r from-cyan-500 to-green-400 text-white rounded-full text-sm font-medium hover:from-cyan-600 hover:to-green-500 transition-all duration-300">
                     Visit Marketplace
                   </a>
                 </div>

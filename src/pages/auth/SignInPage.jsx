@@ -17,7 +17,7 @@ const SignInPage = () => {
   };
 
   return (
-    <div className="lg:min-h-screen min-h-[35rem] flex items-center justify-center bg-gray-100">
+    <div className="lg:min-h-screen min-h-[35rem] flex gap-10 items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign In</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -57,7 +57,22 @@ const SignInPage = () => {
             Signup
           </a>
         </p>
+        
       </div>
+      <div className="bg-white p-8 rounded shadow-md w-full max-w-md  ">
+          <h3 className="text-lg text-emerald-700 font-semibold mb-4">Demo Credentials</h3>
+          <ul className="text-sm text-gray-600 space-y-2">
+            <li>
+              <span className="font-bold">Admin:</span> kapilkp2003@gmail.com / kplgngwr
+            </li>
+            <li>
+              <span className="font-bold">Farmer:</span> alok9532@gmail.com / Alok@9532
+            </li>
+            <li>
+              <span className="font-bold">Consumer:</span> alok953280@gmail.com / Alok@9532
+            </li>
+          </ul>
+        </div>
     </div>
   );
 };
