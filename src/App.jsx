@@ -24,17 +24,6 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/market" element={<Market />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/aboutus" element={<Aboutus />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/education" element={<Education />} />
-        <Route path="/gis" element={<GIS />} />
-        <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/signin" element={<SignInPage />} />
-        <Route path="/resource" element={<Resource />} />
-        <Route path="/research" element={<Reasearch />} />
-        <Route path="/report" element={<Report />} />
       </Routes>
       <Footer />
     </div>
